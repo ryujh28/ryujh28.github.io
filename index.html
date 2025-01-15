@@ -1,147 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CCCV2RGWZ8"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-CCCV2RGWZ8');
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jae Hyun Ryu</title>
+    <title>Jae Hyun Ryu's Homepage</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
             margin: 0;
             padding: 0;
             background-color: #f4f4f9;
             color: #333;
         }
-        header {
-            background-color: #6c63ff;
-            color: white;
-            padding: 1rem 0;
-            text-align: center;
+        .container {
+            display: flex;
+            flex-wrap: nowrap;
+            height: 100vh;
         }
-        header img {
-            border-radius: 50%;
+        /* 왼쪽 컬럼 */
+        .left-column {
+            flex: 1;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .left-column img {
             width: 150px;
             height: 150px;
-            margin-top: 10px;
+            border-radius: 50%;
+            margin-bottom: 15px;
         }
-        section {
-            max-width: 800px;
-            margin: 20px auto;
-            background: white;
+        /* 오른쪽 컬럼 */
+        .right-column {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+        }
+        .right-column .top {
+            flex: 1;
+            background-color: #333;
+        }
+        .right-column .bottom {
+            flex: 2;
+            display: flex;
+        }
+        /* 오른쪽 하단 - 자기소개와 publication */
+        .bottom .about,
+        .bottom .publications {
+            flex: 1;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        h1, h2 {
-            text-align: center;
-            color: #444;
+        .bottom .about {
+            border-right: 1px solid #ddd;
         }
-        ul {
+        .bottom .publications ul {
             list-style-type: none;
             padding: 0;
         }
-        ul li {
-            margin: 10px 0;
+        .bottom .publications li {
+            margin-bottom: 10px;
         }
-        footer {
-            text-align: center;
-            padding: 10px 0;
-            background: #333;
-            color: white;
-            margin-top: 20px;
-        }
-        a {
-            color: #6c63ff;
+        .bottom .publications a {
             text-decoration: none;
+            color: #6c63ff;
         }
-        a:hover {
+        .bottom .publications a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <!-- 왼쪽 컬럼 -->
+        <div class="left-column">
+            <img src="Photo.jpg" alt="Profile Photo">
+            <h1>Jae Hyun Ryu</h1>
+            <p>Ph.D. Candidate in Chemical and Biological Engineering</p>
+        </div>
 
-<header style="text-align: center; margin-bottom: 20px;">
-    <img src="Photo.jpg" alt="Profile Photo" style="width: 150px; height: 150px; border-radius: 50%; margin-bottom: 15px;">
-    <h1>Jae Hyun Ryu</h1>
-    <p>Ph.D. Candidate in Chemical and Biological Engineering</p>
-    <div style="margin-top: 10px;">
-        <!-- Google Scholar -->
-        <a href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&hl=ko&oi=ao" target="_blank" style="margin: 0 10px; text-decoration: none;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar" style="width: 30px; height: 30px; vertical-align: middle;">
-        </a>
-        <!-- ResearchGate -->
-        <a href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" style="margin: 0 10px; text-decoration: none;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_SVG.svg" alt="ResearchGate" style="width: 30px; height: 30px; vertical-align: middle;">
-        </a>
-        <!-- ORCID -->
-        <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" style="margin: 0 10px; text-decoration: none;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID" style="width: 30px; height: 30px; vertical-align: middle;">
-        </a>
+        <!-- 오른쪽 컬럼 -->
+        <div class="right-column">
+            <!-- 검은 칸 -->
+            <div class="top"></div>
+
+            <!-- 자기소개와 publication -->
+            <div class="bottom">
+                <div class="about">
+                    <h2>About Me</h2>
+                    <p>
+                        I am a Ph.D. candidate specializing in computational modeling and machine learning 
+                        applications in chemical and biological engineering. My research focuses on 
+                        understanding molecular interactions and material properties using advanced simulation techniques.
+                    </p>
+                </div>
+                <div class="publications">
+                    <h2>Publications</h2>
+                    <ul>
+                        <li>
+                            <strong>Ryu, J. H.</strong>, et al. Exploring reaction network of acetic acid in supercritical water based on MLIP and ReaxFF. (Submitted)
+                        </li>
+                        <li>
+                            <strong>Ryu, J. H.</strong>, et al. Understanding the dielectric relaxation of liquid water using neural network potential. <i>Journal of Molecular Liquids</i>, 2024.
+                        </li>
+                        <li>
+                            <strong>Ryu, J. H.</strong>, et al. Spatiotemporal characterization of water diffusion anomalies in saline solutions. <i>Science Advances</i>, 2024.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-</header>
-
-
-<section>
-    <h2>About Me</h2>
-    <p>Hi, I’m Jae Hyu Ryu, a Ph.D. candidate in the Department of Chemical and Biological Engineering at Seoul National University. The focus of my research lies in the development of machine learning interatomic potentials for systems with large and complex configuration spaces. A key area of study is reactive molecular dynamics, where the vast configuration space poses significant computational demands. Recently, my work has extended to include active learning and data reduction, aiming to enhance the efficiency of model training. Additionally, I am actively applying machine learning potentials to uncover novel physical and engineering insights that have eluded traditional classical potentials. It’s a pleasure to meet you!</p>
-</section>
-
-<!-- <section>
-    <h2>Background</h2>
-    <ul>
-        <li><strong>Education:</strong> B.S. in Materials Science and Engineering, Korea University, 2021</li>
-        <li><strong>Skills:</strong> DFT, MD, MLIP </li>
-        <li><strong>Languages:</strong> English, Korean</li>
-    </ul>
-</section> -->
-
-<section>
-    <h2>Research Publications</h2>
-    <ul>
-        <li>
-            Yu, J. W., Kim, S., <strong>Ryu, J. H.</strong>, Lee, W. B., & Yoon, T. J. (2024). 
-            Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field. 
-            <i>Science Advances</i>, 10(50), eadp9662. 
-            <a href="DOI: 10.1126/sciadv.adp9662" target="_blank">Read More</a>
-        </li>
-        <li>
-            <strong>Ryu, J. H.</strong>, Yu, J. W., Yoon, T. J., & Lee, W. B. (2024). 
-            Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential. 
-            <i>Journal of Molecular Liquids</i>, 397, 124054. 
-            <a href="https://doi.org/10.1016/j.molliq.2024.124054" target="_blank">Read More</a>
-        </li>
-        <li>
-            Han, S., <strong>Ryu, J. H.</strong>, Lee, W. B., Ryu, J., & Yoon, J. (2024). 
-            Translating the Optimized Durability of Co‐Based Anode Catalyst into Sustainable Anion Exchange Membrane Water Electrolysis. 
-            <i>Small</i>, 2311052. 
-            <a href="https://doi.org/10.1002/smll.202311052" target="_blank">Read More</a>
-        </li>
-        <li>
-            Park, M., Shim, Y., Cho, J., Kwak, S. J., <strong>Ryu, J. H.</strong>, Seo, B., & Lee, W. B. (2023). 
-            Electrochemical Stability Windows of Sulfone-Based Electrolyte System for Lithium Metal Batteries: Insight from MD-Assisted DFT Calculation. 
-            <i>The Journal of Physical Chemistry C</i>, 127(46), 22447-22456. 
-            <a href="https://doi.org/10.1021/acs.jpcc.3c03661" target="_blank">Read More</a>
-        </li>
-    </ul>
-</section>
-
-
-    
-<footer>
-    <p>Connect with me on <a href="https://github.com/ryujh28" target="_blank">GitHub</a> | <a href="mailto:ryujh28@snu.ac.kr">Email</a></p>
-</footer>
-
 </body>
 </html>
