@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jae Hyun Ryu's Homepage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #0F0F0F;
+        }
+        .container {
+            display: flex;
+            flex-wrap: nowrap;
+            height: 100vh;
+        }
+        /* 왼쪽 컬럼 */
+        .left-column {
+            flex: 1;
+            background-color: #ECECF4;
+            border-right: 1px solid #ddd;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .left-column img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        /* 오른쪽 컬럼 */
+        .right-column {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+        }
+        .right-column .top {
+            flex: 1;
+            background-color: #333;
+        }
+        .right-column .bottom {
+            flex: 2;
+            display: flex;
+        }
+        /* 오른쪽 하단 - 자기소개와 publication */
+        .bottom .about,
+        .bottom .publications {
+            flex: 1;
+            padding: 20px;
+        }
+        .bottom .about {
+            border-right: 1px solid #ddd;
+        }
+        .bottom .publications ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .bottom .publications li {
+            margin-bottom: 10px;
+        }
+        .bottom .publications a {
+            text-decoration: none;
+            color: #6c63ff;
+        }
+        .bottom .publications a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 왼쪽 컬럼 -->
+        <div class="left-column">
+            <img src="Photo1.jpg" alt="Profile Photo" 
+            style="width: 300px; height: 300px; border: 5px solid #ECECF4; margin-bottom: 15px; object-fit: cover; border-radius: 0;">
+
+            <h1>Jae Hyun Ryu</h1>
+            <p>Ph.D. Candidate in Chemical and Biological Engineering</p>
+                <!-- 링크 섹션 -->
+            <div style="margin-top: 10px;">
+                <!-- Google Scholar -->
+                <a href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&hl=ko&oi=ao" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+                <!-- ResearchGate -->
+                <a href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_SVG.svg" alt="ResearchGate" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+                <!-- ORCID -->
+                <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+            </div>
+        </div>
+
+        <!-- 오른쪽 컬럼 -->
+        <div class="right-column">
+            <!-- 검은 칸 -->
+            <div class="top"></div>
+
+            <!-- 자기소개와 publication -->
+            <div class="bottom">
+                <div class="about">
+                    <h2>Computational Scientist</h2>
+                <div style="text-align: left; margin-top: 5px;">
+                    <p style="font-size: 1.0em; margin-bottom: 10px;">
+                    best describes who I am. My research bridges <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">computational chemistry</span> and <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">machine learning</span>, with a focus on expansive configurational space systems. 
+                    </p>    
+                    <p style="font-size: 1.0em; margin-bottom: 10px;">
+                    I am particularly interested in developing and applying machine learning force fields in reaction spaces and performing uncertainty quantification within configurational spaces.
+                    </p>
+                </div>
+                    
+
+                </div>
+                <div class="publications">
+                    <h2>Publications</h2>
+                    <ul>
+                        <li>
+                            Yu, J. W., Kim, S., <strong>Ryu, J. H.</strong>, Lee, W. B., & Yoon, T. J. (2024). 
+                            Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field. 
+                            <i>Science Advances</i>, 10(50), eadp9662. 
+                            <a href="https://doi.org/10.1126/sciadv.adp9662" target="_blank">Read More</a>
+                        </li>
+                        <li>
+                            <strong>Ryu, J. H.</strong>, Yu, J. W., Yoon, T. J., & Lee, W. B. (2024). 
+                            Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential. 
+                            <i>Journal of Molecular Liquids</i>, 397, 124054. 
+                            <a href="https://doi.org/10.1016/j.molliq.2024.124054" target="_blank">Read More</a>
+                        </li>
+                        <li>
+                            Han, S., <strong>Ryu, J. H.</strong>, Lee, W. B., Ryu, J., & Yoon, J. (2024). 
+                            Translating the Optimized Durability of Co‐Based Anode Catalyst into Sustainable Anion Exchange Membrane Water Electrolysis. 
+                            <i>Small</i>, 2311052. 
+                            <a href="https://doi.org/10.1002/smll.202311052" target="_blank">Read More</a>
+                        </li>
+                        <li>
+                            Park, M., Shim, Y., Cho, J., Kwak, S. J., <strong>Ryu, J. H.</strong>, Seo, B., & Lee, W. B. (2023). 
+                            Electrochemical Stability Windows of Sulfone-Based Electrolyte System for Lithium Metal Batteries: Insight from MD-Assisted DFT Calculation. 
+                            <i>The Journal of Physical Chemistry C</i>, 127(46), 22447-22456. 
+                            <a href="https://doi.org/10.1021/acs.jpcc.3c03661" target="_blank">Read More</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
