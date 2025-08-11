@@ -3,461 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jae Hyun Ryu - Computational Scientist</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Jae Hyun Ryu's Homepage</title>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --accent-color: #3b82f6;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --background: #ffffff;
-            --surface: #f8fafc;
-            --border: #e5e7eb;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
-        * {
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background-color: #f4f4f9;
+            color: #0F0F0F;
         }
-        
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background: var(--background);
-        }
-        
         .container {
-            min-height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            max-width: 1400px;
-            margin: 0 auto;
-            box-shadow: var(--shadow-lg);
-        }
-        
-        /* Profile Section */
-        .profile-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 3rem 2rem;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-wrap: nowrap;
+            height: 100vh;
+        }
+        /* 왼쪽 컬럼 */
+        .left-column {
+            flex: 1;
+            background-color: #ECECF4;
+            border-right: 1px solid #ddd;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .profile-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            animation: float 20s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-        
-        .profile-image {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            margin-bottom: 2rem;
-            border: 4px solid rgba(255,255,255,0.2);
-            object-fit: cover;
-            transition: transform 0.3s ease;
-            z-index: 2;
-            position: relative;
-        }
-        
-        .profile-image:hover {
-            transform: scale(1.05);
-        }
-        
-        .profile-content {
-            z-index: 2;
-            position: relative;
-        }
-        
-        .profile-name {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(45deg, #fff, #e0e7ff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .profile-title {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-        
-        .social-links {
+            padding: 20px;
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
             justify-content: center;
-            margin-bottom: 2rem;
-        }
-        
-        .social-link {
-            display: flex;
             align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.1);
+        }
+        .left-column img {
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            margin-bottom: 15px;
         }
-        
-        .social-link:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-3px);
-        }
-        
-        .social-link img {
-            width: 24px;
-            height: 24px;
-            filter: brightness(0) invert(1);
-        }
-        
-        .contact-info {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            line-height: 1.8;
-        }
-        
-        /* Main Content */
-        .main-content {
-            background: var(--background);
+        /* 오른쪽 컬럼 */
+        .right-column {
+            flex: 3;
             display: flex;
             flex-direction: column;
         }
-        
-        .hero-section {
-            background: linear-gradient(135deg, var(--surface), #f1f5f9);
-            padding: 3rem 2rem 2rem;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-        
-        .hero-description {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            line-height: 1.7;
-        }
-        
-        .content-sections {
+        .right-column .top {
             flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            background-color: #333;
         }
-        
-        .about-section, .publications-section {
-            padding: 3rem 2rem;
-        }
-        
-        .about-section {
-            border-right: 1px solid var(--border);
-            background: var(--background);
-        }
-        
-        .publications-section {
-            background: var(--surface);
-        }
-        
-        .section-header {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 1.5rem;
+        .right-column .bottom {
+            flex: 2;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
-        
-        .section-icon {
-            width: 24px;
-            height: 24px;
-            color: var(--primary-color);
-        }
-        
-        .about-text {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-        
-        .highlight {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        
-        .publications-list {
-            list-style: none;
-        }
-        
-                .publication-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border-left: 4px solid var(--accent-color);
-        }
-        
-        .publication-item:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-        
-        /* Layout with cover image */
-        .publication-item.has-cover {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .publication-cover {
-            flex-shrink: 0;
-            width: 80px;
-            height: 100px;
-            border-radius: 8px;
-            object-fit: cover;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease;
-        }
-        
-        .publication-cover:hover {
-            transform: scale(1.05);
-        }
-        
-        /* Content area - flexible for with/without cover */
-        .publication-content {
+        /* 오른쪽 하단 - 자기소개와 publication */
+        .bottom .about,
+        .bottom .publications {
             flex: 1;
+            padding: 20px;
         }
-        
-        .publication-title {
-            font-weight: 500;
-            color: var(--text-primary);
-            line-height: 1.5;
-            margin-bottom: 0.5rem;
+        .bottom .about {
+            border-right: 1px solid #ddd;
         }
-        
-        .publication-journal {
-            color: var(--text-secondary);
-            font-style: italic;
-            margin-bottom: 0.5rem;
+        .bottom .publications ul {
+            list-style-type: none;
+            padding: 0;
         }
-        
-        .publication-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-color);
+        .bottom .publications li {
+            margin-bottom: 10px;
+        }
+        .bottom .publications a {
             text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.2s ease;
+            color: #6c63ff;
         }
-        
-        .publication-link:hover {
-            color: var(--secondary-color);
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-                max-width: 100%;
-            }
-            
-            .content-sections {
-                grid-template-columns: 1fr;
-            }
-            
-            .about-section {
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .profile-section {
-                padding: 2rem 1rem;
-            }
-            
-            .profile-image {
-                width: 150px;
-                height: 150px;
-            }
-            
-            .profile-name {
-                font-size: 2rem;
-            }
-            
-            .hero-section, .about-section, .publications-section {
-                padding: 2rem 1rem;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-            
-            .social-links {
-                gap: 0.5rem;
-            }
-            
-            .social-link {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .publication-item {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .publication-cover {
-                width: 120px;
-                height: 150px;
-                align-self: center;
-            }
+        .bottom .publications a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Profile Section -->
-        <div class="profile-section">
-            <img src="Photo1.jpg" alt="Jae Hyun Ryu" class="profile-image">
-            
-            <div class="profile-content">
-                <h1 class="profile-name">Jae Hyun Ryu</h1>
-                <p class="profile-title">Ph.D. Candidate in Chemical and Biological Engineering</p>
-                
-                <div class="social-links">
-                    <a href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&hl=ko&oi=ao" target="_blank" class="social-link">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar">
-                    </a>
-                    <a href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" class="social-link">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_SVG.svg" alt="ResearchGate">
-                    </a>
-                    <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" class="social-link">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID">
-                    </a>
-                </div>
-                
-                <div class="contact-info">
-                    <p>Computational Chemistry & Machine Learning</p>
-                    <p>Seoul National University</p>
-                </div>
+        <!-- 왼쪽 컬럼 -->
+        <div class="left-column">
+            <img src="Photo1.jpg" alt="Profile Photo" 
+            style="width: 300px; height: 300px; border: 5px solid #ECECF4; margin-bottom: 15px; object-fit: cover; border-radius: 0;">
+
+            <h1>Jae Hyun Ryu</h1>
+            <p>Ph.D. Candidate in Chemical and Biological Engineering</p>
+                <!-- 링크 섹션 -->
+            <div style="margin-top: 10px;">
+                <!-- Google Scholar -->
+                <a href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&hl=ko&oi=ao" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+                <!-- ResearchGate -->
+                <a href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_SVG.svg" alt="ResearchGate" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+                <!-- ORCID -->
+                <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="hero-section">
-                <h1 class="section-title">Computational Scientist</h1>
-                <p class="hero-description">
-                    Bridging the gap between computational chemistry and machine learning, 
-                    with expertise in expansive configurational space systems and 
-                    machine learning force fields.
-                </p>
-            </div>
-            
-            <div class="content-sections">
-                <div class="about-section">
-                    <h2 class="section-header">
-                        <svg class="section-icon" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
-                        </svg>
-                        About Me
-                    </h2>
-                    
-                    <p class="about-text">
-                        My research focuses on developing and applying <span class="highlight">machine learning force fields</span> 
-                        in reaction spaces and performing <span class="highlight">uncertainty quantification</span> 
-                        within configurational spaces.
-                    </p>
-                    
-                    <p class="about-text">
-                        I specialize in bridging <span class="highlight">computational chemistry</span> and 
-                        <span class="highlight">machine learning</span>, with particular interest in 
-                        expansive configurational space systems and their applications to molecular dynamics simulations.
-                    </p>
-                    
-                    <p class="about-text">
-                        My work contributes to advancing our understanding of complex molecular systems 
-                        through innovative computational approaches and data-driven methodologies.
+        <!-- 오른쪽 컬럼 -->
+        <div class="right-column">
+            <!-- 검은 칸 -->
+            <div class="top"></div>
+
+            <!-- 자기소개와 publication -->
+            <div class="bottom">
+                <div class="about">
+                    <h2>Computational Scientist</h2>
+                <div style="text-align: left; margin-top: 5px;">
+                    <p style="font-size: 1.0em; margin-bottom: 10px;">
+                    best describes who I am. My research bridges <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">computational chemistry</span> and <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">machine learning</span>, with a focus on expansive configurational space systems. 
+                    </p>    
+                    <p style="font-size: 1.0em; margin-bottom: 10px;">
+                    I am particularly interested in developing and applying machine learning force fields in reaction spaces and performing uncertainty quantification within configurational spaces.
                     </p>
                 </div>
-                
-                <div class="publications-section">
-                    <h2 class="section-header">
-                        <svg class="section-icon" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Recent Publications
-                    </h2>
                     
-                    <ul class="publications-list">
-                        <li class="publication-item has-cover">
-                            <img src="covers/JCIM.png" alt="Journal Cover" class="publication-cover">
-                            <div class="publication-content">
-                                <div class="publication-title">
+
+                </div>
+                <div class="publications">
+                    <h2>Publications</h2>
+                    <ul>
+                        <li style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; border-left: 4px solid #3b82f6; display: flex; gap: 1rem;">
+                            <img src="covers/JCIM.png" alt="Journal Cover" style="flex-shrink: 0; width: 80px; height: 100px; border-radius: 8px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; line-height: 1.5; margin-bottom: 0.5rem;">
                                     <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential. Journal of Chemical Information and Modeling.
                                 </div>
-                                <div class="publication-journal">Journal of Chemical Information and Modeling</div>
-                                <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" class="publication-link">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
+                                <div style="color: #6b7280; font-style: italic; margin-bottom: 0.5rem;">Journal of Chemical Information and Modeling</div>
+                                <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Read More</a>
                             </div>
                         </li>
-                        <li class="publication-item">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Anseong Park, Jaeyune Ryu, Won Bo Lee
-                                </div>
-                                <div class="publication-journal">Unknown Journal</div>
-                                <a href="#" target="_blank" class="publication-link">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
+                        <li style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+                            <div style="font-weight: 500; line-height: 1.5; margin-bottom: 0.5rem;">
+                                Anseong Park, Jaeyune Ryu, Won Bo Lee
                             </div>
+                            <div style="color: #6b7280; font-style: italic; margin-bottom: 0.5rem;">Unknown Journal</div>
+                            <a href="#" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Read More</a>
                         </li>
                     </ul>
                 </div>
