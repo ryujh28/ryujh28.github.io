@@ -1,0 +1,8 @@
+# New publication 1
+Ryu, J. H., Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential. Journal of Chemical Information and Modeling.
+https://doi.org/10.1021/acs.jcim.5c01032
+
+# New publication 2
+Anseong Park, Jaeyune Ryu, Won Bo Lee 
+Ionic Liquid Molecular Dynamics Simulation with Machine Learning Force Fields: DPMD and MACE
+https://doi.org/10.48550/arXiv.2503.18249
