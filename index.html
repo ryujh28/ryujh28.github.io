@@ -3,142 +3,497 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jae Hyun Ryu's Homepage</title>
+    <title>Jae Hyun Ryu - Computational Scientist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary-color: #1e293b;
+            --secondary-color: #64748b;
+            --accent-color: #3b82f6;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
-            color: #0F0F0F;
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         .container {
-            display: flex;
-            flex-wrap: nowrap;
-            height: 100vh;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--surface);
+            box-shadow: var(--shadow-xl);
         }
-        /* 왼쪽 컬럼 */
-        .left-column {
-            flex: 1;
-            background-color: #ECECF4;
-            border-right: 1px solid #ddd;
-            text-align: center;
-            padding: 20px;
+
+        /* Left Profile Section */
+        .profile-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 3rem 2rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
         }
-        .left-column img {
-            width: 150px;
-            height: 150px;
+
+        .profile-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+            backdrop-filter: blur(10px);
+        }
+
+        .profile-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
-            margin-bottom: 15px;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease;
         }
-        /* 오른쪽 컬럼 */
-        .right-column {
-            flex: 3;
+
+        .profile-image:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .profile-title {
+            font-size: 1.1rem;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .social-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .social-link img {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        /* Right Content Section */
+        .content-section {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            background: var(--background);
+        }
+
+        .about-section {
+            padding: 3rem;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+        }
+
+        .publications-section {
+            padding: 3rem;
+            background: var(--background);
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), #8b5cf6);
+            border-radius: 2px;
+        }
+
+        .about-content {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .about-content strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .about-content p {
+            margin-bottom: 1.25rem;
+        }
+
+        .publications-list {
+            list-style: none;
             display: flex;
             flex-direction: column;
+            gap: 1.5rem;
         }
-        .right-column .top {
-            flex: 1;
-            background-color: #333;
+
+        .publication-item {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-color);
+            position: relative;
+            overflow: hidden;
         }
-        .right-column .bottom {
-            flex: 2;
+
+        .publication-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .publication-item.has-cover {
             display: flex;
+            gap: 1rem;
         }
-        /* 오른쪽 하단 - 자기소개와 publication */
-        .bottom .about,
-        .bottom .publications {
+
+        .publication-cover {
+            flex-shrink: 0;
+            width: 80px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .publication-cover:hover {
+            transform: scale(1.05);
+        }
+
+        .publication-content {
             flex: 1;
-            padding: 20px;
         }
-        .bottom .about {
-            border-right: 1px solid #ddd;
+
+        .publication-title {
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
-        .bottom .publications ul {
-            list-style-type: none;
-            padding: 0;
+
+        .publication-journal {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
         }
-        .bottom .publications li {
-            margin-bottom: 10px;
-        }
-        .bottom .publications a {
+
+        .publication-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-color);
             text-decoration: none;
-            color: #6c63ff;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
-        .bottom .publications a:hover {
-            text-decoration: underline;
+
+        .publication-link:hover {
+            color: #2563eb;
+            gap: 0.75rem;
+        }
+
+        .publication-link svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .publication-link:hover svg {
+            transform: translateX(2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .profile-section {
+                padding: 2rem;
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-section,
+            .publications-section {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-image {
+                width: 150px;
+                height: 150px;
+            }
+
+            .profile-name {
+                font-size: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .publication-item.has-cover {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .publication-cover {
+                width: 100px;
+                height: 125px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 왼쪽 컬럼 -->
-        <div class="left-column">
-            <img src="Photo1.jpg" alt="Profile Photo" 
-            style="width: 300px; height: 300px; border: 5px solid #ECECF4; margin-bottom: 15px; object-fit: cover; border-radius: 0;">
-
-            <h1>Jae Hyun Ryu</h1>
-            <p>Ph.D. Candidate in Chemical and Biological Engineering</p>
-                <!-- 링크 섹션 -->
-            <div style="margin-top: 10px;">
-                <!-- Google Scholar -->
-                <a href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&hl=ko&oi=ao" target="_blank" style="margin: 0 10px; text-decoration: none;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar" style="width: 30px; height: 30px; vertical-align: middle;">
-                </a>
-                <!-- ResearchGate -->
-                <a href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" style="margin: 0 10px; text-decoration: none;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_SVG.svg" alt="ResearchGate" style="width: 30px; height: 30px; vertical-align: middle;">
-                </a>
-                <!-- ORCID -->
-                <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" style="margin: 0 10px; text-decoration: none;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID" style="width: 30px; height: 30px; vertical-align: middle;">
-                </a>
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="profile-content">
+                <img src="Photo1.jpg" alt="Jae Hyun Ryu" class="profile-image">
+                <h1 class="profile-name">Jae Hyun Ryu</h1>
+                <p class="profile-title">Ph.D. Candidate in Chemical and Biological Engineering</p>
+                
+                <div class="social-links">
+                    <a href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&hl=ko&oi=ao" target="_blank" class="social-link" title="Google Scholar">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar">
+                    </a>
+                    <a href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" class="social-link" title="ResearchGate">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_SVG.svg" alt="ResearchGate">
+                    </a>
+                    <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" class="social-link" title="ORCID">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID">
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- 오른쪽 컬럼 -->
-        <div class="right-column">
-            <!-- 검은 칸 -->
-            <div class="top"></div>
+        <!-- Content Section -->
+        <div class="content-section">
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <!-- Decorative background animation -->
+            </div>
 
-            <!-- 자기소개와 publication -->
-            <div class="bottom">
-                <div class="about">
-                    <h2>Computational Scientist</h2>
-                <div style="text-align: left; margin-top: 5px;">
-                    <p style="font-size: 1.0em; margin-bottom: 10px;">
-                    best describes who I am. My research bridges <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">computational chemistry</span> and <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">machine learning</span>, with a focus on expansive configurational space systems. 
-                    </p>    
-                    <p style="font-size: 1.0em; margin-bottom: 10px;">
-                    I am particularly interested in developing and applying machine learning force fields in reaction spaces and performing uncertainty quantification within configurational spaces.
-                    </p>
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- About Section -->
+                <div class="about-section">
+                    <h2 class="section-title">Computational Scientist</h2>
+                    <div class="about-content">
+                        <p>best describes who I am. My research bridges <strong>computational chemistry</strong> and <strong>machine learning</strong>, with a focus on expansive configurational space systems.</p>
+                        <p>I am particularly interested in developing and applying machine learning force fields in reaction spaces and performing uncertainty quantification within configurational spaces.</p>
+                    </div>
                 </div>
-                    
 
-                </div>
-                <div class="publications">
-                    <h2>Publications</h2>
-                    <ul>
-                        <li style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; border-left: 4px solid #3b82f6; display: flex; gap: 1rem;">
-                            <img src="covers/JCIM.png" alt="Journal Cover" style="flex-shrink: 0; width: 80px; height: 100px; border-radius: 8px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; line-height: 1.5; margin-bottom: 0.5rem;">
-                                    <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential. Journal of Chemical Information and Modeling.
+                <!-- Publications Section -->
+                <div class="publications-section">
+                    <h2 class="section-title">Publications</h2>
+                    <ul class="publications-list">
+                        <!-- NEW PUBLICATIONS from publications_list.txt (2025) -->
+                        <li class="publication-item has-cover">
+                            <img src="covers/JCIM.png" alt="Journal Cover" class="publication-cover">
+                            <div class="publication-content">
+                                <div class="publication-title">
+                                    <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential.
                                 </div>
-                                <div style="color: #6b7280; font-style: italic; margin-bottom: 0.5rem;">Journal of Chemical Information and Modeling</div>
-                                <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Read More</a>
+                                <div class="publication-journal">Journal of Chemical Information and Modeling</div>
+                                <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" class="publication-link">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                                    </svg>
+                                    View Article
+                                </a>
                             </div>
                         </li>
-                        <li style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
-                            <div style="font-weight: 500; line-height: 1.5; margin-bottom: 0.5rem;">
-                                Anseong Park, Jaeyune Ryu, Won Bo Lee
+                        <li class="publication-item">
+                            <div class="publication-content">
+                                <div class="publication-title">
+                                    Anseong Park, Jaeyune Ryu, Won Bo Lee (2025). arXiv preprint.
+                                </div>
+                                <div class="publication-journal">arXiv preprint</div>
+                                <a href="#" target="_blank" class="publication-link">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                                    </svg>
+                                    View Article
+                                </a>
                             </div>
-                            <div style="color: #6b7280; font-style: italic; margin-bottom: 0.5rem;">Unknown Journal</div>
-                            <a href="#" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Read More</a>
+                        </li>
+
+                        <!-- EXISTING PUBLICATIONS from backup (2024-2023) -->
+                        <li class="publication-item">
+                            <div class="publication-content">
+                                <div class="publication-title">
+                                    Yu, J. W., Kim, S., <strong>Ryu, J. H.</strong>, Lee, W. B., & Yoon, T. J. (2024). 
+                                    Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field.
+                                </div>
+                                <div class="publication-journal">Science Advances</div>
+                                <a href="https://doi.org/10.1126/sciadv.adp9662" target="_blank" class="publication-link">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                                    </svg>
+                                    View Article
+                                </a>
+                            </div>
+                        </li>
+                        <li class="publication-item">
+                            <div class="publication-content">
+                                <div class="publication-title">
+                                    <strong>Ryu, J. H.</strong>, Yu, J. W., Yoon, T. J., & Lee, W. B. (2024). 
+                                    Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential.
+                                </div>
+                                <div class="publication-journal">Journal of Molecular Liquids</div>
+                                <a href="https://doi.org/10.1016/j.molliq.2024.124054" target="_blank" class="publication-link">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                                    </svg>
+                                    View Article
+                                </a>
+                            </div>
+                        </li>
+                        <li class="publication-item">
+                            <div class="publication-content">
+                                <div class="publication-title">
+                                    Han, S., <strong>Ryu, J. H.</strong>, Lee, W. B., Ryu, J., & Yoon, J. (2024). 
+                                    Translating the Optimized Durability of Co‐Based Anode Catalyst into Sustainable Anion Exchange Membrane Water Electrolysis.
+                                </div>
+                                <div class="publication-journal">Small</div>
+                                <a href="https://doi.org/10.1002/smll.202311052" target="_blank" class="publication-link">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                                    </svg>
+                                    View Article
+                                </a>
+                            </div>
+                        </li>
+                        <li class="publication-item">
+                            <div class="publication-content">
+                                <div class="publication-title">
+                                    Park, M., Shim, Y., Cho, J., Kwak, S. J., <strong>Ryu, J. H.</strong>, Seo, B., & Lee, W. B. (2023). 
+                                    Electrochemical Stability Windows of Sulfone-Based Electrolyte System for Lithium Metal Batteries: Insight from MD-Assisted DFT Calculation.
+                                </div>
+                                <div class="publication-journal">The Journal of Physical Chemistry C</div>
+                                <a href="https://doi.org/10.1021/acs.jpcc.3c03661" target="_blank" class="publication-link">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                                    </svg>
+                                    View Article
+                                </a>
+                            </div>
                         </li>
                     </ul>
                 </div>

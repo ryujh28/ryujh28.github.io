@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jae Hyun Ryu's Homepage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #0F0F0F;
+        }
+        .container {
+            display: flex;
+            flex-wrap: nowrap;
+            height: 100vh;
+        }
+        /* 왼쪽 컬럼 */
+        .left-column {
+            flex: 1;
+            background-color: #ECECF4;
+            border-right: 1px solid #ddd;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .left-column img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        /* 오른쪽 컬럼 */
+        .right-column {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+        }
+        .right-column .top {
+            flex: 1;
+            background-color: #333;
+        }
+        .right-column .bottom {
+            flex: 2;
+            display: flex;
+        }
+        /* 오른쪽 하단 - 자기소개와 publication */
+        .bottom .about,
+        .bottom .publications {
+            flex: 1;
+            padding: 20px;
+        }
+        .bottom .about {
+            border-right: 1px solid #ddd;
+        }
+        .bottom .publications ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .bottom .publications li {
+            margin-bottom: 10px;
+        }
+        .bottom .publications a {
+            text-decoration: none;
+            color: #6c63ff;
+        }
+        .bottom .publications a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 왼쪽 컬럼 -->
+        <div class="left-column">
+            <img src="Photo1.jpg" alt="Profile Photo" 
+            style="width: 300px; height: 300px; border: 5px solid #ECECF4; margin-bottom: 15px; object-fit: cover; border-radius: 0;">
+
+            <h1>Jae Hyun Ryu</h1>
+            <p>Ph.D. Candidate in Chemical and Biological Engineering</p>
+                <!-- 링크 섹션 -->
+            <div style="margin-top: 10px;">
+                <!-- Google Scholar -->
+                <a href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&hl=ko&oi=ao" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Scholar_logo.svg" alt="Google Scholar" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+                <!-- ResearchGate -->
+                <a href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/ResearchGate_icon_SVG.svg" alt="ResearchGate" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+                <!-- ORCID -->
+                <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" style="margin: 0 10px; text-decoration: none;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID" style="width: 30px; height: 30px; vertical-align: middle;">
+                </a>
+            </div>
+        </div>
+
+        <!-- 오른쪽 컬럼 -->
+        <div class="right-column">
+            <!-- 검은 칸 -->
+            <div class="top"></div>
+
+            <!-- 자기소개와 publication -->
+            <div class="bottom">
+                <div class="about">
+                    <h2>Computational Scientist</h2>
+                <div style="text-align: left; margin-top: 5px;">
+                    <p style="font-size: 1.0em; margin-bottom: 10px;">
+                    best describes who I am. My research bridges <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">computational chemistry</span> and <span style="font-size: 1.1em; font-weight:bold; color: #0F0F0F;">machine learning</span>, with a focus on expansive configurational space systems. 
+                    </p>    
+                    <p style="font-size: 1.0em; margin-bottom: 10px;">
+                    I am particularly interested in developing and applying machine learning force fields in reaction spaces and performing uncertainty quantification within configurational spaces.
+                    </p>
+                </div>
+                    
+
+                </div>
+                <div class="publications">
+                    <h2>Publications</h2>
+                    <ul>
+                        <li style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; border-left: 4px solid #3b82f6; display: flex; gap: 1rem;">
+                            <img src="covers/JCIM.png" alt="Journal Cover" style="flex-shrink: 0; width: 80px; height: 100px; border-radius: 8px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; line-height: 1.5; margin-bottom: 0.5rem;">
+                                    <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential. Journal of Chemical Information and Modeling.
+                                </div>
+                                <div style="color: #6b7280; font-style: italic; margin-bottom: 0.5rem;">Journal of Chemical Information and Modeling</div>
+                                <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Read More</a>
+                            </div>
+                        </li>
+                        <li style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; border-left: 4px solid #3b82f6;">
+                            <div style="font-weight: 500; line-height: 1.5; margin-bottom: 0.5rem;">
+                                Anseong Park, Jaeyune Ryu, Won Bo Lee
+                            </div>
+                            <div style="color: #6b7280; font-style: italic; margin-bottom: 0.5rem;">Unknown Journal</div>
+                            <a href="#" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Read More</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
