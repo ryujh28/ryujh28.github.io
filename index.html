@@ -223,7 +223,7 @@
             list-style: none;
         }
         
-        .publication-item {
+                .publication-item {
             background: white;
             padding: 1.5rem;
             border-radius: 12px;
@@ -231,13 +231,17 @@
             margin-bottom: 1.5rem;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             border-left: 4px solid var(--accent-color);
-            display: flex;
-            gap: 1rem;
         }
         
         .publication-item:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-lg);
+        }
+        
+        /* Layout with cover image */
+        .publication-item.has-cover {
+            display: flex;
+            gap: 1rem;
         }
         
         .publication-cover {
@@ -254,6 +258,7 @@
             transform: scale(1.05);
         }
         
+        /* Content area - flexible for with/without cover */
         .publication-content {
             flex: 1;
         }
@@ -423,12 +428,11 @@
                     </h2>
                     
                     <ul class="publications-list">
-                        <li class="publication-item">
-                            <img src="journal_covers/journal_of_chemical_information_and_modeling_cover.jpg" alt="Journal Cover" class="publication-cover">
+                        <li class="publication-item has-cover">
+                            <img src="covers/JCIM.png" alt="Journal Cover" class="publication-cover">
                             <div class="publication-content">
                                 <div class="publication-title">
-                                    <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). 
-                                    Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential.
+                                    <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential. Journal of Chemical Information and Modeling.
                                 </div>
                                 <div class="publication-journal">Journal of Chemical Information and Modeling</div>
                                 <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" class="publication-link">
@@ -440,88 +444,13 @@
                                 </a>
                             </div>
                         </li>
-                        
                         <li class="publication-item">
-                            <img src="journal_covers/arxiv_preprint_cover.jpg" alt="Journal Cover" class="publication-cover">
                             <div class="publication-content">
                                 <div class="publication-title">
-                                    Park, A., <strong>Ryu, J.</strong>, & Lee, W. B. (2025). 
-                                    Ionic Liquid Molecular Dynamics Simulation with Machine Learning Force Fields: DPMD and MACE.
+                                    Anseong Park, Jaeyune Ryu, Won Bo Lee
                                 </div>
-                                <div class="publication-journal">arXiv preprint</div>
-                                <a href="https://doi.org/10.48550/arXiv.2503.18249" target="_blank" class="publication-link">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        
-                        <li class="publication-item">
-                            <img src="journal_covers/science_advances__10_50___eadp9662_cover.jpg" alt="Journal Cover" class="publication-cover">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Yu, J. W., Kim, S., <strong>Ryu, J. H.</strong>, Lee, W. B., & Yoon, T. J. (2024). 
-                                    Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field.
-                                </div>
-                                <div class="publication-journal">Science Advances, 10(50), eadp9662</div>
-                                <a href="https://doi.org/10.1126/sciadv.adp9662" target="_blank" class="publication-link">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        
-                        <li class="publication-item">
-                            <img src="journal_covers/journal_of_molecular_liquids__397__124054_cover.jpg" alt="Journal Cover" class="publication-cover">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    <strong>Ryu, J. H.</strong>, Yu, J. W., Yoon, T. J., & Lee, W. B. (2024). 
-                                    Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential.
-                                </div>
-                                <div class="publication-journal">Journal of Molecular Liquids, 397, 124054</div>
-                                <a href="https://doi.org/10.1016/j.molliq.2024.124054" target="_blank" class="publication-link">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        
-                        <li class="publication-item">
-                            <img src="journal_covers/small__2311052_cover.jpg" alt="Journal Cover" class="publication-cover">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Han, S., <strong>Ryu, J. H.</strong>, Lee, W. B., Ryu, J., & Yoon, J. (2024). 
-                                    Translating the Optimized Durability of Co‐Based Anode Catalyst into Sustainable Anion Exchange Membrane Water Electrolysis.
-                                </div>
-                                <div class="publication-journal">Small, 2311052</div>
-                                <a href="https://doi.org/10.1002/smll.202311052" target="_blank" class="publication-link">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        
-                        <li class="publication-item">
-                            <img src="journal_covers/the_journal_of_physical_chemistry_c__127_46___22447_22456_cover.jpg" alt="Journal Cover" class="publication-cover">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Park, M., Shim, Y., Cho, J., Kwak, S. J., <strong>Ryu, J. H.</strong>, Seo, B., & Lee, W. B. (2023). 
-                                    Electrochemical Stability Windows of Sulfone-Based Electrolyte System for Lithium Metal Batteries: Insight from MD-Assisted DFT Calculation.
-                                </div>
-                                <div class="publication-journal">The Journal of Physical Chemistry C, 127(46), 22447-22456</div>
-                                <a href="https://doi.org/10.1021/acs.jpcc.3c03661" target="_blank" class="publication-link">
+                                <div class="publication-journal">Unknown Journal</div>
+                                <a href="#" target="_blank" class="publication-link">
                                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
                                         <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
