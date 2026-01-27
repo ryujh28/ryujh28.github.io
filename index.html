@@ -349,6 +349,74 @@
                 height: 125px;
             }
         }
+            .lead{
+                  font-size: 1.02rem;
+                  color: var(--text-secondary);
+                  margin-bottom: 1rem;
+                }
+                
+                .subsection-title{
+                  margin-top: 2.25rem;
+                  margin-bottom: 1rem;
+                  font-size: 1.125rem;
+                  font-weight: 700;
+                  color: var(--text-primary);
+                  letter-spacing: -0.01em;
+                }
+                
+                .info-block{
+                  background: linear-gradient(180deg, rgba(248,250,252,0.6), rgba(255,255,255,1));
+                  border: 1px solid var(--border);
+                  border-radius: 14px;
+                  padding: 1.25rem;
+                  box-shadow: var(--shadow);
+                }
+                
+                .bullet-list{
+                  margin-top: 0.75rem;
+                  padding-left: 1.25rem;
+                  color: var(--text-secondary);
+                }
+                
+                .bullet-list li{
+                  margin: 0.4rem 0;
+                }
+                
+                .item{
+                  padding: 0.85rem 0;
+                  border-bottom: 1px dashed var(--border);
+                }
+                
+                .item:last-child{
+                  border-bottom: none;
+                }
+                
+                .item-head{
+                  display: flex;
+                  align-items: baseline;
+                  justify-content: space-between;
+                  gap: 1rem;
+                }
+                
+                .item-title{
+                  color: var(--text-primary);
+                  font-weight: 600;
+                }
+                
+                .item-meta{
+                  color: var(--text-secondary);
+                  font-size: 0.9rem;
+                  white-space: nowrap;
+                }
+                
+                .item-desc{
+                  margin-top: 0.35rem;
+                  color: var(--text-secondary);
+                  font-size: 0.95rem;
+                }
+
+
+        
     </style>
 </head>
 <body>
@@ -385,12 +453,69 @@
             <div class="main-content">
                 <!-- About Section -->
                 <div class="about-section">
-                    <h2 class="section-title">Computational Scientist</h2>
-                    <div class="about-content">
-                        <p>best describes who I am. My research bridges <strong>computational chemistry</strong> and <strong>machine learning</strong>, with a focus on expansive configurational space systems.</p>
-                        <p>I am particularly interested in developing and applying machine learning force fields in reaction spaces and performing uncertainty quantification within configurational spaces.</p>
+                      <h2 class="section-title">Research Interests</h2>
+                    
+                      <div class="info-block">
+                        <p class="lead">
+                          I work at the intersection of <strong>computational chemistry</strong> and <strong>machine learning</strong>,
+                          focusing on complex systems with large configurational spaces.
+                        </p>
+                    
+                        <ul class="bullet-list">
+                          <li>Machine-learning interatomic potentials (MLIPs) for reactive/complex condensed-phase systems</li>
+                          <li>Reaction network exploration in extreme environments (e.g., supercritical water)</li>
+                          <li>Dielectric response and molecular-level characterization of liquids and solutions</li>
+                          <li>Uncertainty quantification and robust sampling in high-dimensional configurational spaces</li>
+                        </ul>
+                      </div>
+                    
+                      <h3 class="subsection-title">Education</h3>
+                      <div class="info-block">
+                        <div class="item">
+                          <div class="item-head">
+                            <span class="item-title"><strong>Ph.D.</strong> in Chemical and Biological Engineering</span>
+                            <span class="item-meta">Seoul National University·</span>
+                          </div>
+                          <div class="item-desc">Thesis: Molecular-Level Understanding of Water's Dielectric Relaxation and Supercritical Oxidation Reaction Mecahnism via Neural Network Potential · Advisor: Won Bo Lee</div>
+                        </div>
+                    
+                        <div class="item">
+                          <div class="item-head">
+                            <span class="item-title"><strong>B.S.</strong> in Materials Science and Engineering</span>
+                            <span class="item-meta">Korea University</span>
+                          </div>
+                          <div class="item-desc">Alumni Association Scholarship (Spring 2020)</div>
+                        </div>
+                      </div>
+                    
+                      <h3 class="subsection-title">Career</h3>
+                      <div class="info-block">
+                        <div class="item">
+                          <div class="item-head">
+                            <span class="item-title"><strong>Incoming</strong> (or Current) Position · Samsung Electronics (DS)</span>
+                            <span class="item-meta">2026.03–Present</span>
+                          </div>
+                          <div class="item-desc">OPC / Lithography (optional: team or domain)</div>
+                        </div>
+                    
+                        <div class="item">
+                          <div class="item-head">
+                            <span class="item-title"><strong>Samsung Electronics PhD Scholarship Recipient</strong></span>
+                            <span class="item-meta">2025.09-2026.02</span>
+                          </div>
+                          <div class="item-desc"></div>
+                        </div>
+                    
+                        <div class="item">
+                          <div class="item-head">
+                            <span class="item-title"><strong>Selected Activities</strong></span>
+                            <span class="item-meta">YYYY</span>
+                          </div>
+                          <div class="item-desc">e.g., Teaching Assistant, Conference presentation, Leadership, etc.</div>
+                        </div>
+                      </div>
                     </div>
-                </div>
+
 
                 <!-- Publications Section -->
                 <div class="publications-section">
