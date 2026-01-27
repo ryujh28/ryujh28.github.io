@@ -163,18 +163,17 @@
             50% { transform: translateY(-20px) rotate(180deg); }
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-            background: var(--background);
-        }
+            .main-content{
+              display: grid;
+              grid-template-columns: 1fr; /* 기존 1fr 1fr -> 1fr */
+              background: var(--background);
+            }
+            
+            .about-section{
+              border-right: none; /* 2컬럼 경계 제거 */
+              background: var(--surface);
+            }
 
-        .about-section {
-            padding: 3rem;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-        }
 
         .publications-section {
             padding: 3rem;
@@ -415,8 +414,68 @@
                   font-size: 0.95rem;
                 }
 
+                /* Left navigation */
+                .nav-links{
+                  display: grid;
+                  gap: 0.75rem;
+                  margin-top: 1.5rem;
+                  width: 100%;
+                  max-width: 260px;
+                }
+                
+                .nav-link{
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  padding: 0.85rem 1rem;
+                  border-radius: 14px;
+                  text-decoration: none;
+                  color: white;
+                  font-weight: 600;
+                  letter-spacing: -0.01em;
+                  background: rgba(255, 255, 255, 0.12);
+                  border: 1px solid rgba(255, 255, 255, 0.18);
+                  backdrop-filter: blur(10px);
+                  transition: transform 0.2s ease, background 0.2s ease;
+                }
+                
+                .nav-link:hover{
+                  transform: translateY(-2px);
+                  background: rgba(255, 255, 255, 0.18);
+                }
+                
+                /* Smooth scrolling */
+                html{
+                  scroll-behavior: smooth;
+                }
 
-        
+                  .publication-link:hover svg {
+                    transform: translateX(2px);
+                  }
+                
+                  /* ✅ 여기 아래에 붙이면 됨 */
+                  .pub-tabs{
+                    display: flex;
+                    gap: 0.75rem;
+                    margin: 1rem 0 1.25rem;
+                  }
+                
+                  .pub-tab{
+                    border: 1px solid var(--border);
+                    background: var(--surface);
+                    padding: 0.6rem 0.9rem;
+                    border-radius: 999px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    color: var(--text-secondary);
+                    transition: all 0.2s ease;
+                  }
+                
+                  .pub-tab.active{
+                    border-color: rgba(59,130,246,0.6);
+                    color: var(--text-primary);
+                    box-shadow: var(--shadow);
+                  }
     </style>
 </head>
 <body>
@@ -438,6 +497,13 @@
                     <a href="https://orcid.org/0009-0004-8263-3334" target="_blank" class="social-link" title="ORCID">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/ORCID_iD.svg" alt="ORCID">
                     </a>
+                    <div class="nav-links">
+                      <a class="nav-link" href="#education">Education</a>
+                      <a class="nav-link" href="#career">Career</a>
+                      <a class="nav-link" href="#research">Research Interests</a>
+                      <a class="nav-link" href="#publications">Publications</a>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -453,176 +519,276 @@
             <div class="main-content">
                 <!-- About Section -->
                 <div class="about-section">
-                      <h2 class="section-title">Research Interests</h2>
-                    
-                      <div class="info-block">
-                        <p class="lead">
-                          I work at the intersection of <strong>computational chemistry</strong> and <strong>machine learning</strong>,
-                          focusing on complex systems with large configurational spaces.
-                        </p>
-                    
-                        <ul class="bullet-list">
-                          <li>Machine-learning interatomic potentials (MLIPs) for reactive/complex condensed-phase systems</li>
-                          <li>Reaction network exploration in extreme environments (e.g., supercritical water)</li>
-                          <li>Dielectric response and molecular-level characterization of liquids and solutions</li>
-                          <li>Uncertainty quantification and robust sampling in high-dimensional configurational spaces</li>
-                        </ul>
-                      </div>
-                    
-                      <h3 class="subsection-title">Education</h3>
-                      <div class="info-block">
-                        <div class="item">
-                          <div class="item-head">
-                            <span class="item-title"><strong>Ph.D.</strong> in Chemical and Biological Engineering</span>
-                            <span class="item-meta">Seoul National University·</span>
-                          </div>
-                          <div class="item-desc">Thesis: Molecular-Level Understanding of Water's Dielectric Relaxation and Supercritical Oxidation Reaction Mecahnism via Neural Network Potential · Advisor: Won Bo Lee</div>
-                        </div>
-                    
-                        <div class="item">
-                          <div class="item-head">
-                            <span class="item-title"><strong>B.S.</strong> in Materials Science and Engineering</span>
-                            <span class="item-meta">Korea University</span>
-                          </div>
-                          <div class="item-desc">Alumni Association Scholarship (Spring 2020)</div>
-                        </div>
-                      </div>
-                    
-                      <h3 class="subsection-title">Career</h3>
-                      <div class="info-block">
-                        <div class="item">
-                          <div class="item-head">
-                            <span class="item-title"><strong>Incoming</strong> (or Current) Position · Samsung Electronics (DS)</span>
-                            <span class="item-meta">2026.03–Present</span>
-                          </div>
-                          <div class="item-desc">OPC / Lithography (optional: team or domain)</div>
-                        </div>
-                    
-                        <div class="item">
-                          <div class="item-head">
-                            <span class="item-title"><strong>Samsung Electronics PhD Scholarship Recipient</strong></span>
-                            <span class="item-meta">2025.09-2026.02</span>
-                          </div>
-                          <div class="item-desc"></div>
-                        </div>
-                    
-                        <div class="item">
-                          <div class="item-head">
-                            <span class="item-title"><strong>Selected Activities</strong></span>
-                            <span class="item-meta">YYYY</span>
-                          </div>
-                          <div class="item-desc">e.g., Teaching Assistant, Conference presentation, Leadership, etc.</div>
-                        </div>
-                      </div>
-                    </div>
 
+  <!-- Education -->
+  <section id="education">
+    <h2 class="section-title">Education</h2>
+    <div class="info-block">
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title"><strong>Ph.D.</strong> in Chemical and Biological Engineering</span>
+          <span class="item-meta">Seoul National University</span>
+        </div>
+        <div class="item-desc">
+          Thesis: Molecular-Level Understanding of Water's Dielectric Relaxation and Supercritical Oxidation Reaction Mechanism via Neural Network Potential · Advisor: Won Bo Lee
+        </div>
+      </div>
 
-                <!-- Publications Section -->
-                <div class="publications-section">
-                    <h2 class="section-title">Publications</h2>
-                    <ul class="publications-list">
-                        <!-- NEW PUBLICATIONS from publications_list.txt (2025) -->
-                        <li class="publication-item has-cover">
-                            <img src="covers/JCIM.png" alt="Journal Cover" class="publication-cover">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B. (2025). Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential.
-                                </div>
-                                <div class="publication-journal">Journal of Chemical Information and Modeling</div>
-                                <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" class="publication-link">
-                                    <svg fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        <li class="publication-item">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Anseong Park, Jaeyune Ryu, Won Bo Lee (2025). arXiv preprint.
-                                </div>
-                                <div class="publication-journal">arXiv preprint</div>
-                                <a href="#" target="_blank" class="publication-link">
-                                    <svg fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title"><strong>B.S.</strong> in Materials Science and Engineering</span>
+          <span class="item-meta">Korea University</span>
+        </div>
+        <div class="item-desc">Alumni Association Scholarship (Spring 2020)</div>
+      </div>
+    </div>
+  </section>
 
-                        <!-- EXISTING PUBLICATIONS from backup (2024-2023) -->
-                        <li class="publication-item">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Yu, J. W., Kim, S., <strong>Ryu, J. H.</strong>, Lee, W. B., & Yoon, T. J. (2024). 
-                                    Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field.
-                                </div>
-                                <div class="publication-journal">Science Advances</div>
-                                <a href="https://doi.org/10.1126/sciadv.adp9662" target="_blank" class="publication-link">
-                                    <svg fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        <li class="publication-item">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    <strong>Ryu, J. H.</strong>, Yu, J. W., Yoon, T. J., & Lee, W. B. (2024). 
-                                    Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential.
-                                </div>
-                                <div class="publication-journal">Journal of Molecular Liquids</div>
-                                <a href="https://doi.org/10.1016/j.molliq.2024.124054" target="_blank" class="publication-link">
-                                    <svg fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        <li class="publication-item">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Han, S., <strong>Ryu, J. H.</strong>, Lee, W. B., Ryu, J., & Yoon, J. (2024). 
-                                    Translating the Optimized Durability of Co‐Based Anode Catalyst into Sustainable Anion Exchange Membrane Water Electrolysis.
-                                </div>
-                                <div class="publication-journal">Small</div>
-                                <a href="https://doi.org/10.1002/smll.202311052" target="_blank" class="publication-link">
-                                    <svg fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                        <li class="publication-item">
-                            <div class="publication-content">
-                                <div class="publication-title">
-                                    Park, M., Shim, Y., Cho, J., Kwak, S. J., <strong>Ryu, J. H.</strong>, Seo, B., & Lee, W. B. (2023). 
-                                    Electrochemical Stability Windows of Sulfone-Based Electrolyte System for Lithium Metal Batteries: Insight from MD-Assisted DFT Calculation.
-                                </div>
-                                <div class="publication-journal">The Journal of Physical Chemistry C</div>
-                                <a href="https://doi.org/10.1021/acs.jpcc.3c03661" target="_blank" class="publication-link">
-                                    <svg fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
-                                        <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
-                                    </svg>
-                                    View Article
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+  <!-- Career -->
+  <section id="career" style="margin-top:2.5rem;">
+    <h2 class="section-title">Career</h2>
+    <div class="info-block">
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title"><strong>Incoming</strong> Position · Samsung Electronics (DS)</span>
+          <span class="item-meta">2026.03–Present</span>
+        </div>
+        <div class="item-desc">OPC / Lithography</div>
+      </div>
+
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title"><strong>Samsung Electronics PhD Scholarship Recipient</strong></span>
+          <span class="item-meta">2025.09–2026.02</span>
+        </div>
+        <div class="item-desc"></div>
+      </div>
+
+      <div class="item">
+        <div class="item-head">
+          <span class="item-title"><strong>Selected Activities</strong></span>
+          <span class="item-meta">YYYY</span>
+        </div>
+        <div class="item-desc">Teaching Assistant · Conference presentations · Leadership (edit as needed)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Interests -->
+  <section id="research" style="margin-top:2.5rem;">
+    <h2 class="section-title">Research Interests</h2>
+    <div class="info-block">
+      <p class="lead">
+        I work at the intersection of <strong>computational chemistry</strong> and <strong>machine learning</strong>,
+        focusing on complex systems with large configurational spaces.
+      </p>
+
+      <ul class="bullet-list">
+        <li>Machine-learning interatomic potentials (MLIPs) for reactive/complex condensed-phase systems</li>
+        <li>Reaction network exploration in extreme environments (e.g., supercritical water)</li>
+        <li>Dielectric response and molecular-level characterization of liquids and solutions</li>
+        <li>Uncertainty quantification and robust sampling in high-dimensional configurational spaces</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Publications -->
+  <section id="publications" style="margin-top:2.5rem;">
+    <h2 class="section-title">Publications</h2>
+
+    <div class="pub-tabs">
+      <button class="pub-tab active" data-target="featured" type="button">Featured</button>
+      <button class="pub-tab" data-target="all" type="button">All</button>
+    </div>
+
+    <!-- Featured -->
+    <div class="pub-panel" id="pub-featured">
+      <ul class="publications-list">
+        <li class="publication-item has-cover">
+          <img src="covers/JCIM.png" alt="Journal Cover" class="publication-cover">
+          <div class="publication-content">
+            <div class="publication-title">
+              <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., &amp; Lee, W. B. (2025).
+              Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential.
             </div>
+            <div class="publication-journal">Journal of Chemical Information and Modeling</div>
+            <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+
+        <li class="publication-item">
+          <div class="publication-content">
+            <div class="publication-title">
+              Yu, J. W., Kim, S., <strong>Ryu, J. H.</strong>, Lee, W. B., &amp; Yoon, T. J. (2024).
+              Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field.
+            </div>
+            <div class="publication-journal">Science Advances</div>
+            <a href="https://doi.org/10.1126/sciadv.adp9662" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+
+        <li class="publication-item">
+          <div class="publication-content">
+            <div class="publication-title">
+              <strong>Ryu, J. H.</strong>, Yu, J. W., Yoon, T. J., &amp; Lee, W. B. (2024).
+              Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential.
+            </div>
+            <div class="publication-journal">Journal of Molecular Liquids</div>
+            <a href="https://doi.org/10.1016/j.molliq.2024.124054" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- All -->
+    <div class="pub-panel" id="pub-all" style="display:none;">
+      <ul class="publications-list">
+        <li class="publication-item has-cover">
+          <img src="covers/JCIM.png" alt="Journal Cover" class="publication-cover">
+          <div class="publication-content">
+            <div class="publication-title">
+              <strong>Ryu, J. H.</strong>, Kim, S., Kim, M., Yu, J. W., Yoon, T. J., &amp; Lee, W. B. (2025).
+              Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential.
+            </div>
+            <div class="publication-journal">Journal of Chemical Information and Modeling</div>
+            <a href="https://doi.org/10.1021/acs.jcim.5c01032" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+
+        <li class="publication-item">
+          <div class="publication-content">
+            <div class="publication-title">Anseong Park, Jaeyune Ryu, Won Bo Lee (2025). arXiv preprint.</div>
+            <div class="publication-journal">arXiv preprint</div>
+            <a href="#" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+
+        <li class="publication-item">
+          <div class="publication-content">
+            <div class="publication-title">
+              Yu, J. W., Kim, S., <strong>Ryu, J. H.</strong>, Lee, W. B., &amp; Yoon, T. J. (2024).
+              Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field.
+            </div>
+            <div class="publication-journal">Science Advances</div>
+            <a href="https://doi.org/10.1126/sciadv.adp9662" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+
+        <li class="publication-item">
+          <div class="publication-content">
+            <div class="publication-title">
+              <strong>Ryu, J. H.</strong>, Yu, J. W., Yoon, T. J., &amp; Lee, W. B. (2024).
+              Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential.
+            </div>
+            <div class="publication-journal">Journal of Molecular Liquids</div>
+            <a href="https://doi.org/10.1016/j.molliq.2024.124054" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+
+        <li class="publication-item">
+          <div class="publication-content">
+            <div class="publication-title">
+              Han, S., <strong>Ryu, J. H.</strong>, Lee, W. B., Ryu, J., &amp; Yoon, J. (2024).
+              Translating the Optimized Durability of Co‐Based Anode Catalyst into Sustainable Anion Exchange Membrane Water Electrolysis.
+            </div>
+            <div class="publication-journal">Small</div>
+            <a href="https://doi.org/10.1002/smll.202311052" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+
+        <li class="publication-item">
+          <div class="publication-content">
+            <div class="publication-title">
+              Park, M., Shim, Y., Cho, J., Kwak, S. J., <strong>Ryu, J. H.</strong>, Seo, B., &amp; Lee, W. B. (2023).
+              Electrochemical Stability Windows of Sulfone-Based Electrolyte System for Lithium Metal Batteries: Insight from MD-Assisted DFT Calculation.
+            </div>
+            <div class="publication-journal">The Journal of Physical Chemistry C</div>
+            <a href="https://doi.org/10.1021/acs.jpcc.3c03661" target="_blank" class="publication-link" rel="noopener">
+              <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+              </svg>
+              View Article
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
+
         </div>
     </div>
+
+    <script>
+  const tabs = document.querySelectorAll(".pub-tab");
+  const featured = document.getElementById("pub-featured");
+  const all = document.getElementById("pub-all");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      const target = tab.dataset.target;
+      if (target === "featured") {
+        featured.style.display = "block";
+        all.style.display = "none";
+      } else {
+        featured.style.display = "none";
+        all.style.display = "block";
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
