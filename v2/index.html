@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jae Hyun Ryu</title>
+<meta name="description" content="Jae Hyun Ryu — Staff Engineer at Samsung Electronics working on OPC and lithography, with a background in machine-learned interatomic potentials.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+/* ===== Tokens (from the "Jae Hyun Ryu" design system) ===== */
+:root{
+  --surface-000:#0c1113; --surface-100:#121a1c; --surface-200:#182224; --accent-tint:#133230;
+  --line:#243234; --line-strong:#56716f;
+  --ink:#e3eeee; --ink-muted:#a3b8b8; --ink-subtle:#86a0a0;
+  --accent:#4fd1c5; --accent-strong:#7fe3d9; --on-accent:#06201d;
+  --pattern-line:rgba(79,209,197,.35); --grid-line:rgba(79,209,197,.07);
+  --font-sans:"Inter","Pretendard",system-ui,-apple-system,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",monospace;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;--space-24:96px;
+  --radius-sm:4px;--radius-md:8px;--radius-lg:14px;
+  --shadow-outline:0 0 0 1px rgba(79,209,197,.35);
+  --content-max:1100px;--grid-pitch:24px;--nav-height:64px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-height) + var(--space-4))}
+body{background:var(--surface-000);color:var(--ink);font-family:var(--font-sans);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--accent-strong)}
+:focus-visible{outline:2px solid var(--accent-strong);outline-offset:2px;border-radius:2px}
+.wrap{max-width:var(--content-max);margin:0 auto;padding:0 var(--space-6)}
+.meta{font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-subtle)}
+.code{font-family:var(--font-mono);font-size:13px;color:var(--ink-subtle)}
+
+/* ===== Nav ===== */
+nav.top{position:fixed;inset:0 0 auto 0;height:var(--nav-height);z-index:10;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+nav.top.scrolled{background:rgba(12,17,19,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom-color:var(--line)}
+nav.top .wrap{height:100%;display:flex;align-items:center;gap:var(--space-8)}
+.logo{font-weight:800;letter-spacing:-.02em;color:var(--ink);font-size:18px;margin-right:auto}
+.logo span{color:var(--accent)}
+.navlinks{display:flex;gap:var(--space-6);list-style:none}
+.navlinks a{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);padding:var(--space-2) 0;position:relative}
+.navlinks a:hover{color:var(--ink)}
+.navlinks a.active{color:var(--accent)}
+.navlinks a.active::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--accent)}
+
+/* ===== Hero ===== */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding:calc(var(--nav-height) + var(--space-12)) 0 var(--space-12)}
+.hero .bg{position:absolute;inset:0;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:var(--grid-pitch) var(--grid-pitch);mask-image:radial-gradient(ellipse 70% 70% at 70% 45%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(ellipse 70% 70% at 70% 45%,#000 30%,transparent 80%)}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:var(--space-12);align-items:center;width:100%}
+.hero h1{font-size:clamp(44px,7vw,80px);line-height:.98;font-weight:800;letter-spacing:-.035em;margin:var(--space-4) 0 var(--space-6)}
+.hero .lead{font-size:clamp(17px,1.6vw,19px);line-height:1.6;color:var(--ink-muted);max-width:520px}
+.hero .lead em{font-style:normal;color:var(--accent)}
+.links{display:flex;flex-wrap:wrap;gap:var(--space-3);margin-top:var(--space-8)}
+.btn{display:inline-flex;align-items:center;gap:var(--space-2);font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:10px 14px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);color:var(--ink);transition:border-color .2s,color .2s,background .2s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:500}
+.btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong);color:var(--on-accent)}
+.btn svg{width:14px;height:14px}
+
+/* OPC figure */
+.opc-fig{position:relative;aspect-ratio:1/1;width:100%;max-width:440px;justify-self:end}
+.opc-fig svg{width:100%;height:100%;overflow:visible}
+.opc-fig .target{fill:none;stroke:var(--ink-subtle);stroke-width:1;stroke-dasharray:4 4}
+.opc-fig .mask{fill:none;stroke:var(--accent);stroke-width:1.5}
+.opc-fig .mask-fill{fill:var(--accent);opacity:.06}
+.opc-fig .print{fill:none;stroke:var(--accent-strong);stroke-width:1.2;opacity:0}
+.opc-fig .legend{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;fill:var(--ink-subtle)}
+.opc-fig .lg-line{stroke-width:1.5}
+.photo{position:absolute;right:0;bottom:0;width:36%;aspect-ratio:1/1;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line-strong);background:var(--surface-100)}
+.photo img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.15)}
+.photo .ph{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-weight:800;font-size:28px;letter-spacing:-.02em;color:var(--accent)}
+.photo.noimg .ph{display:flex}
+@media (prefers-reduced-motion:no-preference){
+  .opc-fig .mask{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 2.4s .4s ease-out forwards}
+  .opc-fig .mask-fill{opacity:0;animation:fadeFill 1s 2.4s forwards}
+  .opc-fig .print{animation:printCycle 6s 2.8s ease-in-out infinite}
+}
+@media (prefers-reduced-motion:reduce){.opc-fig .print{opacity:.8}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadeFill{to{opacity:.06}}
+@keyframes printCycle{0%,100%{opacity:0}35%,70%{opacity:.9}}
+
+/* ===== Sections ===== */
+section.block{padding:var(--space-24) 0;border-top:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:var(--space-4);margin-bottom:var(--space-12)}
+.sec-head .num{font-family:var(--font-mono);font-size:13px;color:var(--accent)}
+.sec-head h2{font-size:clamp(30px,4vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.sec-head .rule{flex:1;height:12px;align-self:center;background:
+  linear-gradient(var(--pattern-line),var(--pattern-line)) left center/100% 1px no-repeat}
+.sec-head .rule{position:relative}
+.sec-head .rule::after{content:"";position:absolute;right:0;top:0;width:10px;height:12px;border:1px solid var(--pattern-line);border-radius:1px}
+
+/* About */
+.about{display:grid;grid-template-columns:1.3fr 1fr;gap:var(--space-12)}
+.about p{color:var(--ink-muted);margin-bottom:var(--space-4)}
+.about p:first-child{font-size:19px;line-height:1.6;color:var(--ink)}
+.facts{list-style:none;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--surface-100)}
+.facts li{display:grid;grid-template-columns:110px 1fr;gap:var(--space-3);padding:var(--space-4) var(--space-6);border-bottom:1px solid var(--line);font-size:14px;line-height:1.5}
+.facts li:last-child{border-bottom:0}
+.facts .meta{padding-top:2px}
+
+/* Research */
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-6)}
+.card{background:var(--surface-100);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-8) var(--space-6);transition:background .2s,box-shadow .2s,border-color .2s;position:relative}
+.card:hover{background:var(--surface-200);box-shadow:var(--shadow-outline);border-color:transparent}
+.card .idx{font-family:var(--font-mono);font-size:12px;color:var(--accent);margin-bottom:var(--space-4);display:block}
+.card h3{font-size:22px;line-height:1.25;font-weight:700;letter-spacing:-.01em;margin-bottom:var(--space-3)}
+.card p{font-size:14px;line-height:1.6;color:var(--ink-muted)}
+.card.now{background:var(--accent-tint);border-color:rgba(79,209,197,.25)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-4)}
+.chip{font-family:var(--font-mono);font-size:11px;padding:3px 8px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);color:var(--ink-muted)}
+
+/* Publications */
+.tabs{display:inline-flex;border:1px solid var(--line-strong);border-radius:var(--radius-sm);margin-bottom:var(--space-8);overflow:hidden}
+.tabs button{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:none;border:0;color:var(--ink-muted);padding:8px 16px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.pubs{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-6)}
+.pub{display:grid;grid-template-columns:104px 1fr;gap:var(--space-6);background:var(--surface-100);border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-6);transition:background .2s,box-shadow .2s,border-color .2s;color:inherit}
+.pub:hover{background:var(--surface-200);box-shadow:var(--shadow-outline);border-color:transparent;color:inherit}
+.pub .cover{position:relative;width:104px;aspect-ratio:3/4;border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-200);border:1px solid var(--line)}
+.pub .cover img{width:100%;height:100%;object-fit:cover;display:block}
+.pub .cover .fb{position:absolute;inset:0;display:none;flex-direction:column;justify-content:space-between;padding:10px;font-family:var(--font-mono);font-size:10px;line-height:1.3;color:var(--accent);background:repeating-linear-gradient(90deg,transparent 0 11px,var(--grid-line) 11px 12px),var(--surface-200)}
+.pub .cover.noimg .fb{display:flex}
+.pub .cover .fb b{font-family:var(--font-sans);font-size:15px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
+.pub h3{font-size:16px;line-height:1.4;font-weight:600;margin:var(--space-2) 0 var(--space-3)}
+.pub .authors{font-size:13px;line-height:1.55;color:var(--ink-muted)}
+.pub .authors strong{color:var(--ink);font-weight:600}
+.pub .doi{margin-top:var(--space-3);display:block}
+.pub .top{display:flex;gap:var(--space-2);align-items:center;flex-wrap:wrap}
+.badge{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:var(--radius-sm);background:var(--accent-tint);color:var(--accent);border:1px solid rgba(79,209,197,.3)}
+.pub[hidden]{display:none}
+
+/* Journey timeline */
+.journey{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-12)}
+.journey h3.col{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-subtle);font-weight:500;margin-bottom:var(--space-6)}
+.tl{list-style:none;position:relative;padding-left:var(--space-8)}
+.tl::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:var(--line-strong)}
+.tl li{position:relative;padding-bottom:var(--space-8)}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:calc(-1 * var(--space-8) + 1px);top:8px;width:9px;height:9px;border:1px solid var(--accent);background:var(--surface-000);border-radius:1px}
+.tl li.current::before{background:var(--accent)}
+.tl .when{font-family:var(--font-mono);font-size:12px;color:var(--accent)}
+.tl h4{font-size:18px;font-weight:600;line-height:1.35;margin:2px 0 4px}
+.tl p{font-size:14px;line-height:1.6;color:var(--ink-muted)}
+.tl p i{color:var(--ink-subtle)}
+
+/* Talks & teaching */
+.talks{list-style:none;border-top:1px solid var(--line)}
+.talks li{display:grid;grid-template-columns:140px 1fr auto;gap:var(--space-6);align-items:baseline;padding:var(--space-4) 0;border-bottom:1px solid var(--line)}
+.talks .ev{font-family:var(--font-mono);font-size:13px;color:var(--accent)}
+.talks .t{font-size:15px;line-height:1.5}
+.teach{margin-top:var(--space-12);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--space-4)}
+.teach div{border:1px solid var(--line);border-radius:var(--radius-md);padding:var(--space-4) var(--space-6)}
+.teach .t{font-size:14px;line-height:1.5;margin-top:4px}
+
+/* Footer */
+footer{border-top:1px solid var(--line);padding:var(--space-12) 0}
+footer .wrap{display:flex;flex-wrap:wrap;gap:var(--space-6);justify-content:space-between;align-items:center}
+footer .links{margin-top:0}
+
+/* Reveal */
+@media (prefers-reduced-motion:no-preference){
+  .reveal{opacity:0;transform:translateY(12px);transition:opacity .4s ease-out,transform .4s ease-out}
+  .reveal.in{opacity:1;transform:none}
+}
+
+/* ===== Responsive ===== */
+@media (max-width:900px){
+  .hero .wrap,.about,.journey{grid-template-columns:1fr}
+  .opc-fig{justify-self:start;max-width:360px}
+  .cards,.pubs{grid-template-columns:1fr}
+  .talks li{grid-template-columns:1fr auto;gap:var(--space-2) var(--space-4)}
+  .talks .ev{grid-column:1/-1}
+}
+@media (max-width:640px){
+  .wrap{padding:0 var(--space-4)}
+  .navlinks{display:none}
+  section.block{padding:var(--space-12) 0}
+  .sec-head{margin-bottom:var(--space-8)}
+  .pub{grid-template-columns:72px 1fr;gap:var(--space-4);padding:var(--space-4)}
+  .pub .cover{width:72px}
+  .pub .cover .fb b{font-size:12px}
+  .facts li{grid-template-columns:1fr;gap:2px;padding:var(--space-3) var(--space-4)}
+  .card{padding:var(--space-6) var(--space-4)}
+}
+</style>
+</head>
+<body>
+
+<nav class="top" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#top">JHR<span>.</span></a>
+    <ul class="navlinks">
+      <li><a href="#about">About</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#publications">Publications</a></li>
+      <li><a href="#journey">Journey</a></li>
+      <li><a href="#talks">Talks</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="bg" aria-hidden="true"></div>
+  <div class="wrap">
+    <div>
+      <div class="meta">Staff Engineer · Samsung Electronics · OPC</div>
+      <h1>Jae Hyun<br>Ryu</h1>
+      <p class="lead">I work on optical proximity correction for next-generation memory, drawing on a background in <em>machine-learned interatomic potentials</em> and computational chemistry.</p>
+      <div class="links">
+        <a class="btn primary" href="#publications">Publications</a>
+        <a class="btn" href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&amp;hl=ko&amp;oi=ao" target="_blank" rel="noopener">Google Scholar</a>
+        <a class="btn" href="https://orcid.org/0009-0004-8263-3334" target="_blank" rel="noopener">ORCID</a>
+        <a class="btn" href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" rel="noopener">ResearchGate</a>
+      </div>
+    </div>
+
+    <div class="opc-fig" aria-label="Diagram: a target layout, its OPC-corrected mask, and the printed contour">
+      <svg viewBox="0 0 440 440" role="img">
+        <!-- target layout (dashed) -->
+        <rect class="target" x="80"  y="60" width="48" height="240"/>
+        <rect class="target" x="176" y="60" width="48" height="240"/>
+        <rect class="target" x="272" y="60" width="48" height="160"/>
+        <rect class="target" x="272" y="220" width="120" height="48"/>
+        <!-- OPC mask: hammerheads at line ends, serifs at outer corners, inner-corner notch -->
+        <path class="mask-fill" d="M72 48h64v14h-6v226h6v24H72v-24h6V62h-6z M168 48h64v14h-6v226h6v24h-64v-24h6V62h-6z"/>
+        <path class="mask" d="M72 48h64v14h-6v226h6v24H72v-24h6V62h-6z"/>
+        <path class="mask" d="M168 48h64v14h-6v226h6v24h-64v-24h6V62h-6z"/>
+        <path class="mask" d="M264 48h64v14h-6v150h6v4h52v-8h24v8h8v60h-8v8h-24v-8h-102v-16h6V62h-6z"/>
+        <!-- printed contour (rounded, close to target) -->
+        <rect class="print" x="82" y="63" width="44" height="234" rx="18"/>
+        <rect class="print" x="178" y="63" width="44" height="234" rx="18"/>
+        <path class="print" d="M292 63c10 0 18 6 18 18v139h62c10 0 18 8 18 18v10c0 10-8 18-18 18H292c-10 0-18-8-18-18V81c0-12 8-18 18-18z"/>
+        <!-- legend -->
+        <g transform="translate(0 344)">
+          <line class="target lg-line" x1="0" y1="0" x2="20" y2="0"/><text class="legend" x="28" y="4">TARGET</text>
+          <line class="mask lg-line" x1="0" y1="22" x2="20" y2="22" style="stroke-dasharray:none;animation:none;stroke-dashoffset:0"/><text class="legend" x="28" y="26">OPC MASK</text>
+          <line x1="0" y1="44" x2="20" y2="44" stroke="var(--accent-strong)" stroke-width="1.2"/><text class="legend" x="28" y="48">PRINTED</text>
+        </g>
+      </svg>
+      <div class="photo" id="photo">
+        <img src="../Photo1.jpg" alt="Portrait of Jae Hyun Ryu" onerror="this.parentNode.classList.add('noimg');this.remove()">
+        <div class="ph" aria-hidden="true">JHR</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="block" id="about">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="num">01</span><h2>About</h2><span class="rule" aria-hidden="true"></span></div>
+    <div class="about reveal">
+      <div>
+        <p>Staff Engineer at Samsung Electronics, working on memory semiconductor process development in the Semiconductor R&amp;D Center.</p>
+        <p>I currently work on OPC (Optical Proximity Correction) within the Flash Process Development Team, contributing to advanced lithography and patterning for next-generation memory devices.</p>
+        <p>My background is in computational chemistry and machine learning applied to engineering problems: ML interatomic potentials, supercritical water reactions, and the dielectric response of liquids.</p>
+      </div>
+      <ul class="facts">
+        <li><span class="meta">Now</span><span>Samsung Electronics (DS), Semiconductor R&amp;D Center — Flash Process Development, OPC</span></li>
+        <li><span class="meta">Ph.D.</span><span>Chemical and Biological Engineering, Seoul National University, 2026</span></li>
+        <li><span class="meta">B.S.</span><span>Materials Science and Engineering, Korea University, 2021</span></li>
+        <li><span class="meta">Focus</span><span>Lithography · OPC · MLIPs · Reactive MD</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="research">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="num">02</span><h2>Research</h2><span class="rule" aria-hidden="true"></span></div>
+    <div class="cards">
+      <article class="card now reveal">
+        <span class="idx">NOW — INDUSTRY</span>
+        <h3>Optical proximity correction</h3>
+        <p>Lithography and patterning for next-generation memory devices, as part of the Flash Process Development Team.</p>
+        <div class="chips"><span class="chip">OPC</span><span class="chip">Lithography</span><span class="chip">Patterning</span></div>
+      </article>
+      <article class="card reveal">
+        <span class="idx">A — POTENTIALS</span>
+        <h3>MLIPs, NNPs and reactive potentials</h3>
+        <p>Developing and validating machine-learned potentials, with uncertainty quantification and robust workflows.</p>
+        <div class="chips"><span class="chip">MLIP</span><span class="chip">NNP</span><span class="chip">UQ</span></div>
+      </article>
+      <article class="card reveal">
+        <span class="idx">B — REACTIONS</span>
+        <h3>Reaction networks and rare events</h3>
+        <p>Reaction networks, sampling and rare events in condensed phases, including oxidation in supercritical water.</p>
+        <div class="chips"><span class="chip">Reactive MD</span><span class="chip">Supercritical water</span></div>
+      </article>
+      <article class="card reveal">
+        <span class="idx">C — LIQUIDS</span>
+        <h3>Liquid structure, dynamics and response</h3>
+        <p>Connecting molecular structure and dynamics to the dielectric relaxation of liquid water.</p>
+        <div class="chips"><span class="chip">Dielectric relaxation</span><span class="chip">Water</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="publications">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="num">03</span><h2>Publications</h2><span class="rule" aria-hidden="true"></span></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-filter="featured">Featured</button>
+      <button role="tab" aria-selected="false" data-filter="all">All</button>
+    </div>
+    <div class="pubs" id="pubs"></div>
+  </div>
+</section>
+
+<section class="block" id="journey">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="num">04</span><h2>Journey</h2><span class="rule" aria-hidden="true"></span></div>
+    <div class="journey">
+      <div class="reveal">
+        <h3 class="col">Career</h3>
+        <ul class="tl">
+          <li class="current"><span class="when">2026.03 — Present</span><h4>Staff Engineer, Samsung Electronics (DS)</h4><p>Semiconductor R&amp;D Center · Flash Process Development Team · OPC</p></li>
+          <li><span class="when">2025.09 — 2026.02</span><h4>Samsung Electronics PhD Scholarship</h4><p>Scholarship recipient</p></li>
+          <li><span class="when">2021.12 — 2022.02</span><h4>Visiting Researcher, Georgia Institute of Technology</h4><p>School of Materials Science and Engineering</p></li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <h3 class="col">Education</h3>
+        <ul class="tl">
+          <li><span class="when">2026</span><h4>Ph.D., Chemical and Biological Engineering</h4><p>Seoul National University · Advisor: Won Bo Lee<br><i>Molecular-Level Understanding of Water's Dielectric Relaxation and Supercritical Oxidation Reaction Mechanism via Neural Network Potential</i></p></li>
+          <li><span class="when">2021</span><h4>B.S., Materials Science and Engineering</h4><p>Korea University · Alumni Association Scholarship (Spring 2020)</p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="talks">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="num">05</span><h2>Talks &amp; Teaching</h2><span class="rule" aria-hidden="true"></span></div>
+    <ul class="talks reveal">
+      <li><span class="ev">ASIAN-26 2025</span><span class="t">Application of Machine Learning Potential to Design of Intermetallic Catalysts</span><span></span></li>
+      <li><span class="ev">WATOC 2025</span><span class="t">Understanding the Dielectric Relaxation of Liquid Water Using MLIP</span><span></span></li>
+      <li><span class="ev">ENGE 2024</span><span class="t">Advanced Reactive Molecular Dynamics Using Machine Learning Interatomic Potential</span><span class="badge">Best Oral Award</span></li>
+      <li><span class="ev">ACS Spring 2024</span><span class="t">Understanding the dielectric relaxation of liquid water using neural network potential</span><span></span></li>
+      <li><span class="ev">IUMRS-ICA 2021</span><span class="t">Surface Reconstructions and Nb Doping Effects in Nb-doped NiO (111) Surfaces</span><span></span></li>
+    </ul>
+    <div class="teach reveal">
+      <div><span class="meta">Spring 2024 · Head TA</span><p class="t">Chemical and Biological Process Lab</p></div>
+      <div><span class="meta">Fall 2024 · TA</span><p class="t">Digital Computer Concept and Practice</p></div>
+      <div><span class="meta">Spring 2023 · TA</span><p class="t">Chem. &amp; Bio. Process Lab — Phase equilibrium</p></div>
+      <div><span class="meta">Fall 2021, Spring 2022 · TA</span><p class="t">Chem. &amp; Bio. Process Lab — Liquid-liquid extraction</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="code">© 2026 Jae Hyun Ryu</span>
+    <div class="links">
+      <a class="btn" href="https://scholar.google.com/citations?user=-t0IkmwAAAAJ&amp;hl=ko&amp;oi=ao" target="_blank" rel="noopener">Scholar</a>
+      <a class="btn" href="https://orcid.org/0009-0004-8263-3334" target="_blank" rel="noopener">ORCID</a>
+      <a class="btn" href="https://www.researchgate.net/profile/Jae-Hyun-Ryu-2/research" target="_blank" rel="noopener">ResearchGate</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ---- Publications data (edit here) ----
+  var pubs = [
+    {y:2026, j:"Advanced Energy Materials", short:"Adv. Energy Mater.", featured:true,
+     t:"Machine Learning-Guided Design of L1₀-PtCo Intermetallic Catalysts: Zn-Mediated Atomic Ordering",
+     a:"Chang, H., Ryu, J. H., Lee, K., Roh, J., Lee, S., Bak, J., Shin, D., Kim, M., Yang, H., Lee, W. B., & Cho, E. A.",
+     doi:"10.1002/aenm.202505211", cover:"../covers/aenm70763-gra-0001-m.jpg"},
+    {y:2025, j:"Journal of Chemical Information and Modeling", short:"J. Chem. Inf. Model.", featured:true, first:true,
+     t:"Exploring the Reaction Network of Acetic Acid in Supercritical Water via Machine Learning Interatomic Potential",
+     a:"Ryu, J. H., Kim, S., Kim, M., Yu, J. W., Yoon, T. J., & Lee, W. B.",
+     doi:"10.1021/acs.jcim.5c01032", cover:"../covers/JCIM.png"},
+    {y:2025, j:"arXiv preprint", short:"arXiv", featured:false,
+     t:"Ionic Liquid Molecular Dynamics Simulation with Machine Learning Force Fields: DPMD and MACE",
+     a:"Park, A., Ryu, J., & Lee, W. B.",
+     doi:"10.48550/arXiv.2503.18249", cover:""},
+    {y:2024, j:"Journal of Molecular Liquids", short:"J. Mol. Liq.", featured:true, first:true,
+     t:"Understanding the dielectric relaxation of liquid water using neural network potential and classical pairwise potential",
+     a:"Ryu, J. H., Yu, J. W., Yoon, T. J., & Lee, W. B.",
+     doi:"10.1016/j.molliq.2024.124054", cover:""},
+    {y:2024, j:"Science Advances", short:"Sci. Adv.", featured:false,
+     t:"Spatiotemporal characterization of water diffusion anomalies in saline solutions using machine learning force field",
+     a:"Yu, J. W., Kim, S., Ryu, J. H., Lee, W. B., & Yoon, T. J.",
+     doi:"10.1126/sciadv.adp9662", cover:"../covers/SciAdv_2024_10.jpg"},
+    {y:2024, j:"Small", short:"Small", featured:false,
+     t:"Translating the Optimized Durability of Co‐Based Anode Catalyst into Sustainable Anion Exchange Membrane Water Electrolysis",
+     a:"Han, S., Ryu, J. H., Lee, W. B., Ryu, J., & Yoon, J.",
+     doi:"10.1002/smll.202311052", cover:"../covers/small_2024_20.jpg"},
+    {y:2023, j:"The Journal of Physical Chemistry C", short:"J. Phys. Chem. C", featured:false,
+     t:"Electrochemical Stability Windows of Sulfone-Based Electrolyte System for Lithium Metal Batteries",
+     a:"Park, M., Shim, Y., Cho, J., Kwak, S. J., Ryu, J. H., Seo, B., & Lee, W. B.",
+     doi:"10.1021/acs.jpcc.3c03661", cover:"../covers/JPCC_2023_127.jpg"}
+  ];
+  function esc(s){return s.replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  var box = document.getElementById("pubs");
+  box.innerHTML = pubs.map(function(p){
+    var authors = esc(p.a).replace(/Ryu, J\. H\./g,"<strong>Ryu, J. H.</strong>");
+    var cover = '<div class="cover'+(p.cover?'':' noimg')+'">'
+      + (p.cover?'<img loading="lazy" src="'+p.cover+'" alt="'+esc(p.j)+' cover" onerror="this.parentNode.classList.add(\'noimg\');this.remove()">':'')
+      + '<div class="fb"><span>'+p.y+'</span><b>'+esc(p.short)+'</b></div></div>';
+    return '<a class="pub reveal" data-featured="'+(p.featured?1:0)+'" href="https://doi.org/'+p.doi+'" target="_blank" rel="noopener">'
+      + cover + '<div><div class="top"><span class="meta">'+p.y+' · '+esc(p.j)+'</span>'
+      + (p.first?'<span class="badge">First author</span>':'') + '</div>'
+      + '<h3>'+esc(p.t)+'</h3><p class="authors">'+authors+'</p>'
+      + '<span class="code doi">doi:'+p.doi+'</span></div></a>';
+  }).join("");
+
+  var tabs = document.querySelectorAll(".tabs button");
+  function apply(f){
+    box.querySelectorAll(".pub").forEach(function(el){ el.hidden = (f==="featured" && el.dataset.featured!=="1"); if(!el.hidden) el.classList.add("in"); });
+    tabs.forEach(function(b){ b.setAttribute("aria-selected", b.dataset.filter===f ? "true":"false"); });
+  }
+  tabs.forEach(function(b){ b.addEventListener("click", function(){ apply(b.dataset.filter); }); });
+  apply("featured");
+
+  // nav background + active link
+  var nav = document.getElementById("nav");
+  var links = [].slice.call(document.querySelectorAll(".navlinks a"));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
+  function onScroll(){
+    nav.classList.toggle("scrolled", window.scrollY > 24);
+    var y = window.scrollY + window.innerHeight*0.35, cur = -1;
+    secs.forEach(function(s,i){ if(s && s.offsetTop <= y) cur = i; });
+    links.forEach(function(a,i){ a.classList.toggle("active", i===cur); });
+  }
+  window.addEventListener("scroll", onScroll, {passive:true}); onScroll();
+
+  // reveal on scroll
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target);} }); }, {rootMargin:"0px 0px -8% 0px"});
+    document.querySelectorAll(".reveal").forEach(function(el){ io.observe(el); });
+  } else { document.querySelectorAll(".reveal").forEach(function(el){ el.classList.add("in"); }); }
+})();
+</script>
+</body>
+</html>
