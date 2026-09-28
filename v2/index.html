@@ -373,7 +373,7 @@ footer .links{margin-top:0}
 (function(){
   // ---- Publications data (edit here) ----
   var pubs = [
-    {y:2026, j:"Advanced Energy Materials", short:"Adv. Energy Mater.", featured:true, first:true,
+    {y:2026, j:"Advanced Energy Materials", short:"Adv. Energy Mater.", featured:true, first:"co",
      t:"Machine Learning-Guided Design of L1₀-PtCo Intermetallic Catalysts: Zn-Mediated Atomic Ordering",
      a:"Chang, H., Ryu, J. H., Lee, K., Roh, J., Lee, S., Bak, J., Shin, D., Kim, M., Yang, H., Lee, W. B., & Cho, E. A.",
      doi:"10.1002/aenm.202505211", cover:"../covers/aenm70763-gra-0001-m.jpg"},
@@ -411,7 +411,7 @@ footer .links{margin-top:0}
       + '<div class="fb"><span>'+p.y+'</span><b>'+esc(p.short)+'</b></div></div>';
     return '<a class="pub reveal" data-featured="'+(p.featured?1:0)+'" href="https://doi.org/'+p.doi+'" target="_blank" rel="noopener">'
       + cover + '<div><div class="top"><span class="meta">'+p.y+' · '+esc(p.j)+'</span>'
-      + (p.first?'<span class="badge">First author</span>':'') + '</div>'
+      + (p.first?'<span class="badge">'+(p.first==="co"?"Co-first author":"First author")+'</span>':'') + '</div>'
       + '<h3>'+esc(p.t)+'</h3><p class="authors">'+authors+'</p>'
       + '<span class="code doi">doi:'+p.doi+'</span></div></a>';
   }).join("");
