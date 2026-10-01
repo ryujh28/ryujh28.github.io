@@ -4,32 +4,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tutorials · Jae Hyun Ryu</title>
-<meta name="description" content="Interactive tutorials by Jae Hyun Ryu: device physics and simulation you can run in the browser.">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="_style.css">
+<meta name="description" content="Interactive simulations by Jae Hyun Ryu that run in the browser, each with a guide to the physics behind it.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<link rel="stylesheet" href="kit/gallery.css">
 </head>
 <body>
-<header class="navbar">
-  <div class="nav-inner">
-    <a class="brand" href="../">Jae Hyun Ryu</a>
-    <ul class="nav-links">
-      <li><a href="../">Home</a></li>
-      <li><a href="./" class="active">Tutorials</a></li>
-    </ul>
-  </div>
-</header>
-<main class="page">
+<nav class="top" aria-label="Site"><a class="me" href="../">Jae Hyun Ryu</a><a href="../">Home</a></nav>
+<header class="head">
   <h1>Tutorials</h1>
-  <p class="lead">Small, self-contained tools that run in the browser, each with a write-up of the physics behind it and how it was checked.</p>
-  <div class="grid">
-    <a class="card tcard" href="planar-nmos/">
-      <span class="kicker">Device physics · Interactive</span>
-      <h2>Planar NMOS bench</h2>
-      <p>A compact model of one planar NMOS: set the gate stack, geometry, doping and contacts, and get R, C, delay, leakage and breakdown. Includes a 30 V-class HV device, a design optimizer and a verification suite against 1D/2D Poisson solvers.</p>
-      <div class="tags"><span class="tag">MOSFET</span><span class="tag">Compact model</span><span class="tag">Poisson</span><span class="tag">NSGA-II</span></div>
-    </a>
-  </div>
-</main>
-<footer>© Jae Hyun Ryu · Personal project; not affiliated with any employer.</footer>
+  <p>Simulations that run in your browser. Each one opens straight into the simulation; the guide inside explains the physics whenever you want it.</p>
+</header>
+<main class="list" id="list"></main>
+<footer>Personal projects for learning and exploration; not affiliated with any employer. Parameter values are illustrative.</footer>
+
+<script>
+/* Add a tutorial: append an entry. plate = inline SVG (viewBox 0 0 380 220), drawn with the material colours. */
+var TUTORIALS=[
+ {href:"planar-nmos/", title:"Planar NMOS bench",
+  what:"Set the gate stack, geometry, doping and contacts of one planar NMOS and watch drive current, capacitance, delay, leakage and breakdown follow.",
+  facts:["Logic device and a 30 V-class high-voltage device","Pareto design optimizer with limits you choose","Checked against 1D and 2D Poisson solvers, with the tests runnable in the page"],
+  plate:'<svg viewBox="0 0 380 220" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Cross-section of a planar NMOS: gate, spacers, source and drain, contact plugs">'
+   +'<g stroke="var(--m-edge)" stroke-width=".8">'
+   +'<rect x="0" y="128" width="380" height="92" fill="var(--m-si)"/>'
+   +'<rect x="0" y="128" width="26" height="70" fill="var(--m-ox)"/><rect x="354" y="128" width="26" height="70" fill="var(--m-ox)"/>'
+   +'<path d="M26 128H124V150Q124 166 108 166H26Z" fill="var(--m-np)"/><path d="M354 128H256V150Q256 166 272 166H354Z" fill="var(--m-np)"/>'
+   +'<path d="M120 128H162V134Q162 140 156 140H120Z" fill="var(--m-next)"/><path d="M260 128H218V134Q218 140 224 140H260Z" fill="var(--m-next)"/>'
+   +'<path d="M140 124V84Q140 80 146 80H154V124Z" fill="var(--m-sp)"/><path d="M240 124V84Q240 80 234 80H226V124Z" fill="var(--m-sp)"/>'
+   +'<rect x="154" y="123" width="72" height="5" fill="var(--m-ox)"/>'
+   +'<rect x="154" y="80" width="72" height="43" fill="var(--m-poly)"/>'
+   +'<rect x="62" y="22" width="22" height="106" fill="var(--m-w)"/><rect x="296" y="22" width="22" height="106" fill="var(--m-w)"/>'
+   +'</g></svg>'}
+];
+var list=document.getElementById("list");
+list.innerHTML=TUTORIALS.map(function(t){
+  return '<article class="item">'
+   +'<a class="plate" href="'+t.href+'" tabindex="-1" aria-hidden="true">'+t.plate+'<span class="ring"></span></a>'
+   +'<div class="text"><h2><a href="'+t.href+'">'+t.title+'</a></h2><p class="what">'+t.what+'</p>'
+   +'<ul class="facts">'+t.facts.map(function(f){return '<li>'+f+'</li>';}).join("")+'</ul>'
+   +'<div class="acts"><a class="go" href="'+t.href+'">Open simulation</a><a class="sub" href="'+t.href+'#guide">Read the guide first</a></div></div></article>';
+}).join("");
+</script>
 </body>
 </html>

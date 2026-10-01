@@ -1,0 +1,71 @@
+/* Tutorial shell: top bar, guide drawer, contextual help, first-visit hint.
+   Uses the host page's tokens when present (--bg, --panel, --ink, --ink2, --muted, --line, --accent, --accent-soft,
+   --accent-ink, --sans, --cond, --mono) and falls back to the same values otherwise. */
+:root{
+  --tk-bg:var(--bg,#EEF1F2); --tk-panel:var(--panel,#FBFCFC); --tk-ink:var(--ink,#131A20); --tk-ink2:var(--ink2,#46525C);
+  --tk-muted:var(--muted,#76828C); --tk-line:var(--line,#D7DDE1); --tk-accent:var(--accent,#0A6A93);
+  --tk-accent-soft:var(--accent-soft,#DCEBF2); --tk-accent-ink:var(--accent-ink,#FFFFFF);
+  --tk-sans:var(--sans,"IBM Plex Sans",system-ui,sans-serif); --tk-cond:var(--cond,"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif);
+  --tk-mono:var(--mono,"IBM Plex Mono",ui-monospace,monospace);
+  --tk-bar:44px; --tk-drawer:min(460px,100vw);
+}
+body.tk{padding-top:var(--tk-bar)}
+.tk-bar{position:fixed;inset:0 0 auto 0;height:var(--tk-bar);z-index:900;display:flex;align-items:center;gap:12px;padding:0 14px 0 16px;
+  background:color-mix(in srgb,var(--tk-panel) 88%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--tk-line);font:13px var(--tk-sans);color:var(--tk-ink)}
+.tk-crumbs{display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;overflow:hidden}
+.tk-crumbs a{color:var(--tk-ink2);text-decoration:none}
+.tk-crumbs a:hover{color:var(--tk-accent)}
+.tk-crumbs .sep{color:var(--tk-muted)}
+.tk-crumbs b{font:600 14px var(--tk-cond);letter-spacing:.01em;color:var(--tk-ink);overflow:hidden;text-overflow:ellipsis}
+.tk-sp{flex:1}
+.tk-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:6px;border:1px solid var(--tk-line);background:var(--tk-panel);color:var(--tk-ink);font:500 13px var(--tk-sans);text-decoration:none;cursor:pointer}
+.tk-btn:hover{border-color:var(--tk-accent);color:var(--tk-accent)}
+.tk-btn.on{background:var(--tk-accent);border-color:var(--tk-accent);color:var(--tk-accent-ink)}
+.tk-btn kbd{font:500 11px var(--tk-mono);padding:0 5px;border:1px solid currentColor;border-radius:4px;opacity:.6}
+.tk-btn:focus-visible,.tk-help:focus-visible,.tk-drawer a:focus-visible,.tk-drawer button:focus-visible{outline:2px solid var(--tk-accent);outline-offset:2px}
+@media (max-width:640px){.tk-crumbs .home,.tk-crumbs .sep.first,.tk-btn kbd,.tk-hide-sm{display:none}}
+
+/* drawer */
+.tk-drawer{position:fixed;top:var(--tk-bar);right:0;bottom:0;width:var(--tk-drawer);z-index:901;background:var(--tk-panel);border-left:1px solid var(--tk-line);
+  transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;color:var(--tk-ink);font:14px/1.6 var(--tk-sans)}
+.tk-drawer.open{transform:none;box-shadow:-12px 0 32px rgba(10,20,30,.12)}
+@media (prefers-reduced-motion:reduce){.tk-drawer{transition:none}}
+/* side-by-side only when the page still has room for its own layout; otherwise the drawer overlays */
+@media (min-width:1720px){body.tk-guide-open{padding-right:var(--tk-drawer)}}
+.tk-dh{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 18px;border-bottom:1px solid var(--tk-line)}
+.tk-dh h2{font:600 15px var(--tk-cond);margin:0;flex:1}
+.tk-x{width:30px;height:30px;border-radius:6px;border:1px solid transparent;background:none;color:var(--tk-ink2);font-size:18px;line-height:1;cursor:pointer}
+.tk-x:hover{border-color:var(--tk-line);color:var(--tk-ink)}
+.tk-toc{display:flex;flex-wrap:wrap;gap:6px;padding:10px 18px;border-bottom:1px solid var(--tk-line)}
+.tk-toc a{font:500 12px var(--tk-sans);color:var(--tk-ink2);text-decoration:none;padding:3px 9px;border-radius:999px;background:var(--tk-bg);border:1px solid transparent}
+.tk-toc a:hover{color:var(--tk-accent);border-color:var(--tk-line)}
+.tk-toc a.cur{color:var(--tk-accent-ink);background:var(--tk-accent)}
+.tk-body{overflow:auto;padding:6px 22px 40px;}
+.tk-body section{padding:16px 0 18px;border-bottom:1px solid var(--tk-line);scroll-margin-top:8px}
+.tk-body section:last-child{border-bottom:0}
+.tk-body .flash{animation:tkflash 1.2s ease}
+@keyframes tkflash{0%{background:var(--tk-accent-soft)}100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){.tk-body .flash{animation:none}}
+.tk-body h3{font:600 17px var(--tk-cond);margin:0 0 6px;letter-spacing:.005em}
+.tk-body h4{font:600 13.5px var(--tk-sans);margin:12px 0 2px}
+.tk-body p{margin:6px 0;color:var(--tk-ink)}
+.tk-body ul,.tk-body ol{margin:6px 0;padding-left:20px}
+.tk-body li{margin:3px 0}
+.tk-body .eq{font:12.5px/1.55 var(--tk-mono);background:var(--tk-bg);border-radius:6px;padding:8px 10px;margin:8px 0;overflow-x:auto;white-space:nowrap}
+.tk-body .try{border-left:3px solid var(--tk-accent);background:var(--tk-accent-soft);padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0}
+.tk-body .caveat{border-left:3px solid var(--warn-dot,#E0A100);background:var(--warn-bg,#FFF4DA);color:var(--warn-ink,#6B4A00);padding:8px 12px;border-radius:0 6px 6px 0;margin:10px 0}
+.tk-body table{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0}
+.tk-body th,.tk-body td{border-bottom:1px solid var(--tk-line);padding:5px 6px;text-align:left;vertical-align:top}
+.tk-body th{font-weight:600;color:var(--tk-ink2)}
+.tk-body a{color:var(--tk-accent)}
+
+/* contextual help buttons placed in panel headings */
+.tk-help{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;margin-left:6px;border-radius:50%;border:1px solid var(--tk-line);
+  background:var(--tk-panel);color:var(--tk-ink2);font:600 10.5px/1 var(--tk-sans);letter-spacing:0;text-transform:none;cursor:pointer;vertical-align:1px;padding:0}
+.tk-help:hover{border-color:var(--tk-accent);color:var(--tk-accent)}
+
+/* first-visit hint */
+.tk-hint{position:fixed;left:16px;bottom:16px;z-index:902;max-width:340px;background:var(--tk-panel);border:1px solid var(--tk-line);border-radius:10px;padding:14px 16px;
+  box-shadow:0 10px 30px rgba(10,20,30,.16);font:13.5px/1.5 var(--tk-sans);color:var(--tk-ink)}
+.tk-hint p{margin:0 0 10px}
+.tk-hint .row{display:flex;gap:8px}

@@ -1,232 +1,1041 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Planar NMOS bench · Tutorials · Jae Hyun Ryu</title>
-<meta name="description" content="How a browser-based compact model of a planar NMOS computes R, C, delay, leakage and breakdown, and how it was checked against 1D and 2D Poisson solvers.">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../_style.css">
-</head>
-<body>
-<header class="navbar">
-  <div class="nav-inner">
-    <a class="brand" href="../../">Jae Hyun Ryu</a>
-    <ul class="nav-links">
-      <li><a href="../../">Home</a></li>
-      <li><a href="../" class="active">Tutorials</a></li>
-    </ul>
-  </div>
-</header>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Planar NMOS bench · Tutorials · Jae Hyun Ryu</title><meta name="description" content="Interactive compact-model simulation of a planar NMOS: drive current, capacitance, delay, leakage, breakdown, a 30 V-class device and a design optimizer."><style>body{margin:0} /* keep the sticky input column below the tutorial bar */ @media (min-width:921px){aside.inputs{top:calc(var(--tk-bar) + 8px);max-height:calc(100vh - var(--tk-bar) - 16px)}}</style><link rel="stylesheet" href="../kit/shell.css">
+</head><body>
 
-<main class="page">
-  <div class="crumbs"><a href="../">Tutorials</a> / Planar NMOS bench</div>
-  <h1>A planar NMOS, from gate stack to delay, in the browser</h1>
-  <p class="lead">This bench turns the layout and process numbers of a single planar NMOS (gate stack, gate length, doping, contact plugs) into resistance, capacitance, drive current, delay, leakage and breakdown. Everything runs as plain JavaScript in your browser; no server, no install.</p>
-  <div class="btns">
-    <a class="btn primary" href="simulator.html">Open the simulator →</a>
-    <a class="btn" href="tests.html">Run the verification tests</a>
-  </div>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1F2; --panel:#FBFCFC; --ink:#131A20; --ink2:#46525C; --muted:#76828C;
+  --line:#D7DDE1; --grid:#E4E8EA; --axis:#B9C2C8;
+  --accent:#0A6A93; --accent-soft:#DCEBF2; --accent-ink:#FFFFFF;
+  --warn-bg:#FFF4DA; --warn-ink:#6B4A00; --warn-dot:#E0A100;
+  --s1:#2a78d6; --s2:#eb6834;
+  --q1:#86b6ef; --q2:#5598e7; --q3:#2a78d6; --q4:#1c5cab; --q5:#0d366b;
+  --m-si:#E7E3D9; --m-well:#E7E3D9; --m-np:#9EC5F4; --m-next:#C6DBF7; --m-ddd:#DCE7F5; --m-ox:#CFE8EC; --m-hk:#EDBB55;
+  --m-poly:#E09A83; --m-metal:#8E9CA9; --m-sp:#B4D6A8; --m-ild:#F6F8F9; --m-w:#56616B; --m-edge:#8B959D;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cond:"IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1316; --panel:#161D21; --ink:#E7ECEF; --ink2:#AAB5BD; --muted:#7D8993;
+    --line:#29333A; --grid:#222B31; --axis:#3A464E;
+    --accent:#4FB0D9; --accent-soft:#16303B; --accent-ink:#06151C;
+    --warn-bg:#33290F; --warn-ink:#F2D489; --warn-dot:#F2B829;
+    --s1:#3987e5; --s2:#d95926;
+    --q1:#184f95; --q2:#256abf; --q3:#3987e5; --q4:#6da7ec; --q5:#b7d3f6;
+    --m-si:#3A3731; --m-well:#3A3731; --m-np:#2D5C93; --m-next:#264366; --m-ddd:#2E3B4C; --m-ox:#1E3B42; --m-hk:#8C6A1F;
+    --m-poly:#8A4B39; --m-metal:#56636F; --m-sp:#3C5E36; --m-ild:#1A2227; --m-w:#A4B0BA; --m-edge:#56626B;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1316; --panel:#161D21; --ink:#E7ECEF; --ink2:#AAB5BD; --muted:#7D8993;
+  --line:#29333A; --grid:#222B31; --axis:#3A464E;
+  --accent:#4FB0D9; --accent-soft:#16303B; --accent-ink:#06151C;
+  --warn-bg:#33290F; --warn-ink:#F2D489; --warn-dot:#F2B829;
+  --s1:#3987e5; --s2:#d95926;
+  --q1:#184f95; --q2:#256abf; --q3:#3987e5; --q4:#6da7ec; --q5:#b7d3f6;
+  --m-si:#3A3731; --m-well:#3A3731; --m-np:#2D5C93; --m-next:#264366; --m-ddd:#2E3B4C; --m-ox:#1E3B42; --m-hk:#8C6A1F;
+  --m-poly:#8A4B39; --m-metal:#56636F; --m-sp:#3C5E36; --m-ild:#1A2227; --m-w:#A4B0BA; --m-edge:#56626B;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+.wrap{max-width:1480px;margin:0 auto;padding-inline:20px;padding-block:18px 40px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px}
+header.top h1{font-family:var(--cond);font-weight:600;font-size:24px;letter-spacing:.01em;margin:0;text-wrap:balance}
+header.top p{margin:2px 0 0;color:var(--ink2);font-size:13px}
+.btn{font:500 13px var(--sans);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.app{display:grid;grid-template-columns:minmax(290px,340px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:920px){.app{grid-template-columns:minmax(0,1fr)}}
 
-  <div class="note"><b>What it is and isn't.</b> This is a teaching and trend-exploration tool built on textbook physics and example parameter values. It is not calibrated to any real process, and absolute numbers should not be used for design sign-off. The point is to see <i>which</i> knob moves <i>which</i> output, and why.</div>
+/* ---------- inputs ---------- */
+aside.inputs{position:sticky;top:env(safe-area-inset-top,0px);max-height:calc(100vh - 20px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+@media (max-width:920px){aside.inputs{position:static;max-height:none}}
+.grp{border-bottom:1px solid var(--line);padding:12px 14px 10px}
+.grp:last-child{border-bottom:0}
+.grp-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.grp-h h2{font:600 11px var(--cond);letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);margin:0}
+.grp-h .derived{font:400 11.5px var(--mono);color:var(--accent);text-align:right}
+.row{display:grid;grid-template-columns:1fr 92px;align-items:center;column-gap:8px;padding:3px 0}
+.row label{font-size:12.5px;color:var(--ink)}
+.row label .u{color:var(--muted);font-size:11.5px;margin-left:3px}
+.row input[type=text]{width:100%;font:13px var(--mono);font-variant-numeric:tabular-nums;text-align:right;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:3px 6px}
+.row input[type=text].bad{border-color:#d03b3b}
+.row input[type=range]{grid-column:1 / -1;width:100%;margin:2px 0 2px;accent-color:var(--accent);height:16px}
+.seg{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:2px 0 6px}
+.seg button{flex:1;font:500 12px var(--sans);padding:5px 0;background:var(--bg);color:var(--ink2);border:0;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.hdr-ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hdr-ctl .seg{margin:0;min-width:260px}
+.hdr-ctl .seg button{padding:7px 10px}
 
-  <div class="layout">
-    <nav class="toc" aria-label="Contents">
-      <b>Contents</b>
-      <ol>
-        <li><a href="#what">1. What it computes</a></li>
-        <li><a href="#start">2. Quick start</a></li>
-        <li><a href="#vth">3. Gate stack and V<sub>th</sub></a></li>
-        <li><a href="#sce">4. Short-channel effects</a></li>
-        <li><a href="#current">5. Drain current</a></li>
-        <li><a href="#rc">6. Resistance and capacitance</a></li>
-        <li><a href="#speed">7. Speed metrics</a></li>
-        <li><a href="#leak">8. Leakage</a></li>
-        <li><a href="#bv">9. Breakdown and hot carriers</a></li>
-        <li><a href="#hv">10. The 30 V-class HV device</a></li>
-        <li><a href="#opt">11. Design optimizer</a></li>
-        <li><a href="#verify">12. How it was checked</a></li>
-        <li><a href="#limits">13. Known limitations</a></li>
-      </ol>
-    </nav>
+/* ---------- output ---------- */
+main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.panel h3{font:600 11px var(--cond);letter-spacing:.09em;text-transform:uppercase;color:var(--ink2);margin:0 0 10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.panel h3 .note{font:400 11.5px var(--sans);letter-spacing:0;text-transform:none;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:1100px){.kpis{grid-template-columns:minmax(0,1fr)}}
+.kv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:baseline}
+.kv .k{font-size:12.5px;color:var(--ink2);padding:5px 0;border-bottom:1px dashed var(--grid)}
+.kv .v{font:500 15px var(--mono);font-variant-numeric:tabular-nums;text-align:right;padding:5px 0;border-bottom:1px dashed var(--grid);white-space:nowrap}
+.kv .v small{font:400 11px var(--sans);color:var(--muted);margin-left:4px}
+.kv .k small{display:block;font-size:11px;color:var(--muted)}
+.kv > :nth-last-child(-n+2){border-bottom:0}
+.hero{display:flex;align-items:baseline;gap:8px;margin:-2px 0 8px}
+.hero b{font:500 30px var(--mono);letter-spacing:-.01em}
+.hero span{color:var(--muted);font-size:12px}
+.warns{display:flex;flex-direction:column;gap:6px}
+.warn{display:flex;gap:8px;align-items:flex-start;background:var(--warn-bg);color:var(--warn-ink);border-radius:6px;padding:7px 10px;font-size:12.5px}
+.warn::before{content:"!";flex:none;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--warn-dot);color:#1b1300;font:600 11px var(--sans);margin-top:1px}
 
-    <article>
-      <section id="what">
-        <h2>1. What it computes</h2>
-        <p>The model is a <b>compact model</b>: closed-form equations, the same kind of thing circuit simulators use, rather than a field solver like TCAD. That makes one evaluation take well under a millisecond, which is what lets you drag a slider and see every output update, or let an optimizer try thousands of designs.</p>
-        <div class="tablewrap"><table>
-          <tr><th>Inputs</th><th>Outputs</th></tr>
-          <tr><td>Gate stack: interfacial oxide and high-k thickness and k, poly or metal gate, gate height, fixed charge, interface traps</td><td>V<sub>th</sub> (linear and saturation), DIBL, subthreshold swing</td></tr>
-          <tr><td>Geometry: L<sub>g</sub>, W, gate–extension overlap, spacer width and k, active length</td><td>I<sub>on</sub>, I<sub>eff</sub>, I<sub>off</sub> broken into components, R<sub>on</sub></td></tr>
-          <tr><td>Doping: channel, well, extension (LDD), deep S/D, junction depths</td><td>Series resistance per side, gate resistance</td></tr>
-          <tr><td>Contacts: plug CD, plug-to-gate spacing, plug height and count, barrier height, ILD k</td><td>C<sub>gg</sub>, C<sub>gd</sub>, junction and drain-node capacitance</td></tr>
-          <tr><td>Operating point: V<sub>DD</sub>, temperature, body bias</td><td>CV/I, drain discharge time, f<sub>T</sub>, f<sub>max</sub>, oxide field</td></tr>
-          <tr><td>Layout: spacing to neighbouring devices</td><td>Breakdown voltage and its limiting mechanism, footprint area, V<sub>th</sub> mismatch</td></tr>
-        </table></div>
-        <p>The default device is a 90 nm-class logic transistor (2 nm SiO<sub>2</sub>, V<sub>DD</sub> = 1.2 V). A switch at the top of the simulator changes to a 30 V-class high-voltage device (section 10).</p>
-      </section>
+.xs-wrap{overflow-x:auto}
+#xs{display:block;width:100%;height:auto;max-height:400px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:11.5px;color:var(--ink2)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px;border:1px solid var(--m-edge)}
 
-      <section id="start">
-        <h2>2. Quick start</h2>
-        <ol class="steps">
-          <li>Open the <a href="simulator.html">simulator</a>. Inputs are on the left, results on the right, and a to-scale cross-section shows the device you are describing.</li>
-          <li>Drag <b>Gate length L<sub>g</sub></b> down from 90 nm. Watch V<sub>th</sub> fall and I<sub>off</sub> rise (short-channel effects) while CV/I improves.</li>
-          <li>Raise <b>Gate height</b>. C<sub>gg</sub> grows through the sidewall fringe, so CV/I gets slower, while R<sub>g</sub> falls, so the gate RC improves. Two effects, opposite directions.</li>
-          <li>In <b>Parameter sweep</b>, pick any input and any output to see the full curve, with a dashed line at the current value.</li>
-          <li>In <b>Design optimizer</b>, switch on a few knobs, pick two goals (say I<sub>off</sub> and CV/I), add limits, and run. Click a point on the Pareto front to inspect it, apply it, or re-check it with the 2D solvers.</li>
-        </ol>
-        <div class="tip">The delay outputs are in seconds, so a <i>larger</i> number is a <i>slower</i> device.</div>
-      </section>
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:1100px){.two{grid-template-columns:minmax(0,1fr)}}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:12.5px}
+.bar .lab{color:var(--ink)}
+.bar .lab small{display:block;color:var(--muted);font-size:11px}
+.bar .track{height:10px;background:var(--grid);border-radius:0 4px 4px 0;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:0 4px 4px 0;min-width:1px}
+.bar .fill.alt{background:var(--q2)}
+.bar .val{font:13px var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.bar .val small{color:var(--muted);font-size:11px}
+.sum{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:10px;padding-top:8px;font-size:12.5px;color:var(--ink2)}
+.sum b{font:500 13px var(--mono);color:var(--ink)}
+@media (max-width:520px){.bar{grid-template-columns:minmax(0,1fr) 84px}.bar .track{grid-column:1 / -1;grid-row:2}}
 
-      <section id="vth">
-        <h2>3. Gate stack and threshold voltage</h2>
-        <p>A multi-layer gate dielectric is reduced to an equivalent SiO<sub>2</sub> thickness, and the inversion capacitance adds the depth of the inversion charge and, for a poly gate, the depleted layer of the gate itself:</p>
-        <div class="eq">EOT = t<sub>IL</sub>·3.9/k<sub>IL</sub> + t<sub>HK</sub>·3.9/k<sub>HK</sub> &nbsp;&nbsp; T<sub>inv</sub> = EOT + 0.4 nm + t<sub>poly-dep</sub>·3.9/11.7</div>
-        <p>The long-channel threshold is the textbook expression, with the body bias widening the depletion region:</p>
-        <div class="eq">V<sub>th</sub> = V<sub>FB</sub> + 2φ<sub>F</sub> + √(2qε<sub>Si</sub>N<sub>A</sub>(2φ<sub>F</sub> + V<sub>SB</sub>)) / C<sub>ox</sub>, &nbsp; V<sub>FB</sub> = φ<sub>ms</sub> − qQ<sub>f</sub>/C<sub>ox</sub></div>
-        <p>This is checked against an exact 1D solution of Poisson's equation (the integrated surface charge Q<sub>s</sub>(ψ<sub>s</sub>)), and agrees to better than 0.01 mV, with and without body bias.</p>
-      </section>
+.chart{position:relative;min-height:250px}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart .clegend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--ink2);margin-bottom:4px}
+.chart .clegend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.12);border-radius:6px;padding:6px 8px;font:12px var(--mono);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap;z-index:5}
+.tip .t{color:var(--muted);font-size:11px;margin-bottom:2px}
+.tip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:8px;font-size:12.5px;color:var(--ink2)}
+.ctl select{font:13px var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:4px 6px;max-width:100%}
 
-      <section id="sce">
-        <h2>4. Short-channel effects</h2>
-        <p>When the channel gets short, the source and drain take over part of the depletion charge under the gate, so V<sub>th</sub> falls (roll-off), and the drain voltage lowers the source barrier (DIBL). The model uses the BSIM3 form:</p>
-        <div class="eq">ΔV<sub>th</sub> = −DVT0·θ(L)·(V<sub>bi</sub> − 2φ<sub>F</sub>) − ETA0·θ<sub>DIBL</sub>(L)·V<sub>DS</sub>, &nbsp; θ(L) = e<sup>−D·L/2λ</sup> + 2e<sup>−D·L/λ</sup></div>
-        <p>with a characteristic length λ that grows with oxide thickness, depletion depth and the extension junction depth. The five constants were <b>fitted to a 2D nonlinear Poisson solver</b> written for this project, on a gate-length sweep, then checked on five held-out devices with different doping, oxide, junction depth and overlap. An earlier textbook version (fixed coefficients) under-predicted roll-off by 4–5× against the same 2D solution, which is why the fit was needed.</p>
-        <p>The subthreshold swing uses the Taur–Ning short-channel factor, so it also degrades at short L. Interface traps add qD<sub>it</sub> to the depletion capacitance in the swing.</p>
-      </section>
+details.model{font-size:13px;color:var(--ink2)}
+details.model summary{cursor:pointer;font:600 11px var(--cond);letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+details.model .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:6px 28px;margin-top:10px}
+details.model h4{font:600 12.5px var(--sans);color:var(--ink);margin:10px 0 4px}
+details.model p, details.model li{max-width:68ch;margin:0 0 4px}
+details.model ul{padding-left:18px;margin:0}
+details.model code{font:12px var(--mono);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ---------- optimizer ---------- */
+.opt-grid{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1100px){.opt-grid{grid-template-columns:minmax(0,1fr)}}
+.opt-block{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:10px}
+.opt-block h4{font:600 11px var(--cond);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:0 0 8px;display:flex;justify-content:space-between;gap:8px}
+.opt-block h4 span{font:400 11.5px var(--sans);letter-spacing:0;text-transform:none;color:var(--muted)}
+.opt-vars{max-height:380px;overflow:auto;margin:0 -4px;padding:0 4px}
+.opt-vars .g{font:600 10.5px var(--cond);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px}
+.ov{display:grid;grid-template-columns:34px minmax(0,1fr);gap:2px 8px;align-items:center;padding:3px 0}
+.ov label.n{font-size:12.5px;cursor:pointer}
+.ov label.n .u{color:var(--muted);font-size:11px;margin-left:3px}
+.ov .b{grid-column:2;display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--muted)}
+.ov .b input{width:78px;font:12px var(--mono);text-align:right;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:2px 5px}
+.ov .b .flag{color:var(--warn-ink);background:var(--warn-bg);border-radius:4px;padding:0 5px}
+.sw{position:relative;width:30px;height:17px;appearance:none;-webkit-appearance:none;background:var(--line);border-radius:9px;cursor:pointer;margin:0;transition:background .15s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}
+.sw:checked{background:var(--accent)} .sw:checked::after{left:15px}
+.orow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px;align-items:center;margin-bottom:6px;font-size:12.5px}
+.orow select,.crow select,.crow input,.srow input{font:12.5px var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:3px 5px;min-width:0}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) 52px 76px 24px;gap:6px;align-items:center;margin-bottom:6px}
+.crow input,.srow input{font-family:var(--mono);text-align:right}
+.crow button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0}
+.crow button:hover{color:var(--ink)}
+.srow{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:6px 8px;align-items:center;font-size:12.5px;margin-bottom:6px}
+.btnrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{color:var(--accent-ink);filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:default}
+.ostat{font-size:12px;color:var(--ink2)}
+.hint{font-size:11.5px;color:var(--muted);margin:6px 0 0}
+.opt-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--ink2);margin-bottom:4px}
+.opt-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:0}
+#opt-plot svg{display:block;width:100%}
+.sel{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-top:10px}
+.sel h4{margin:0 0 8px;font:600 12.5px var(--sans)}
+.sel table{border-collapse:collapse;width:100%;font-size:12.5px}
+.sel td,.sel th{padding:3px 6px;border-bottom:1px solid var(--grid);text-align:right;font-variant-numeric:tabular-nums}
+.sel td:first-child,.sel th:first-child{text-align:left}
+.sel th{font-weight:500;color:var(--muted);font-size:11.5px}
+.sel .two{gap:14px}
+.vpass{color:#0c7a0c;font-weight:600} .vfail{color:#c23030;font-weight:600}
+:root[data-theme="dark"] .vpass{color:#5CCB5C} :root[data-theme="dark"] .vfail{color:#F08080}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .vpass{color:#5CCB5C}:root:not([data-theme="light"]) .vfail{color:#F08080}}
+</style>
 
-      <section id="current">
-        <h2>5. Drain current</h2>
-        <p>One smooth expression covers subthreshold to strong inversion (BSIM's effective gate overdrive V<sub>gsteff</sub>), with a universal mobility curve and velocity saturation:</p>
-        <div class="eq">I = (W/L)·µ<sub>eff</sub>·C<sub>inv</sub>·V<sub>gsteff</sub>·[1 − m·V<sub>dseff</sub>/2(V<sub>gsteff</sub>+2v<sub>t</sub>)]·V<sub>dseff</sub> / (1 + V<sub>dseff</sub>/E<sub>sat</sub>L)</div>
-        <p>Above saturation, a velocity-saturated region of length ΔL forms at the drain (channel-length modulation), and the current is multiplied by (1 + ΔL/L). Series resistance is applied self-consistently: the terminal current is the one for which the intrinsic transistor, seeing V<sub>GS</sub> − IR<sub>S</sub> and V<sub>DS</sub> − 2IR<sub>S</sub>, carries exactly that current.</p>
-        <div class="tip">Try the <b>CLM strength</b> input (0 to 2). At 1, the default device's I<sub>on</sub> is about 27% higher than with CLM off, and CV/I is correspondingly faster. That coefficient is the textbook value and has <i>not</i> been fitted (section 13), so the slider lets you see how much the result depends on it.</div>
-      </section>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Planar NMOS Bench</h1>
+      <p id="subtitle">Compact-model estimate of gate/junction/plug capacitance, S/D series resistance, I–V and switching delay for one planar NMOS.</p>
+    </div>
+    <div class="hdr-ctl">
+      <div class="seg" id="devsel" role="group" aria-label="Device type"><button type="button" data-dev="lv">LV logic</button><button type="button" data-dev="hv">HV · 30 V class</button></div>
+      <button class="btn" id="reset" type="button">Reset to example device</button>
+    </div>
+  </header>
 
-      <section id="rc">
-        <h2>6. Resistance and capacitance</h2>
-        <h3>Series resistance (per side)</h3>
-        <ul>
-          <li><b>Front end</b>: where the channel meets the extension, current crowds through the overlap. The gate-induced accumulation layer and the extension form two coupled resistive sheets (a two-layer transmission line), in parallel with the spreading resistance at the gate edge. The coupling coefficient was calibrated against a 2D resistor solver over 27 combinations.</li>
-          <li><b>Extension and deep S/D sheets</b> along the path to the plug, <b>contact resistance</b> from thermionic-field emission (ρ<sub>c</sub> = ρ<sub>c0</sub>·exp(φ<sub>B</sub>/E<sub>0</sub>)), and the <b>plug body</b>.</li>
-        </ul>
-        <p>A nice consequence: R<sub>S</sub> first falls as the overlap grows (less spreading), then rises again (the overlap itself has resistance). The 2D solver shows the same minimum.</p>
-        <h3>Capacitance</h3>
-        <ul>
-          <li><b>Channel and overlap</b> from C<sub>inv</sub> and C<sub>ox</sub>.</li>
-          <li><b>Outer fringe</b> from the gate sidewall through spacer then ILD (quarter-circle field lines), cut off by a grounded contact plug only over the width the plugs actually cover.</li>
-          <li><b>Plug-to-gate</b> plate plus edge fringes, with the spacer and ILD in series.</li>
-          <li><b>Junctions</b> as one-sided abrupt junctions, averaged over the 0 → V<sub>DD</sub> drain swing.</li>
-        </ul>
-        <p>Fringe and plug–gate capacitance agree with a 2D Laplace solver within about 16% over eleven geometries.</p>
-      </section>
+  <div class="app">
+    <aside class="inputs" id="inputs" aria-label="Device parameters"></aside>
 
-      <section id="speed">
-        <h2>7. Speed metrics</h2>
-        <div class="tablewrap"><table>
-          <tr><th>Metric</th><th>Definition</th><th>What it captures</th></tr>
-          <tr><td>CV/I</td><td>C<sub>gg</sub>·V<sub>DD</sub>/I<sub>on</sub></td><td>Intrinsic delay of the transistor driving its own gate charge</td></tr>
-          <tr><td>t<sub>pHL</sub></td><td>C<sub>drain</sub>·V<sub>DD</sub>/(2I<sub>eff</sub>)</td><td>Discharging the drain node (junction + gate–drain + load)</td></tr>
-          <tr><td>R<sub>g</sub>C<sub>gg</sub></td><td>gate sheet R·W/3L<sub>g</sub> × C<sub>gg</sub></td><td>Distributed gate RC</td></tr>
-          <tr><td>f<sub>T</sub>, f<sub>max</sub></td><td>g<sub>m</sub>/2πC<sub>gg</sub>; f<sub>T</sub>/2√(g<sub>ds</sub>(R<sub>g</sub>+R<sub>S</sub>) + 2πf<sub>T</sub>R<sub>g</sub>C<sub>gd</sub>)</td><td>Small-signal limits</td></tr>
-        </table></div>
-        <p>I<sub>eff</sub> is the average of the currents at (V<sub>DD</sub>, V<sub>DD</sub>/2) and (V<sub>DD</sub>/2, V<sub>DD</sub>), a better proxy for switching than I<sub>on</sub> alone.</p>
-      </section>
+    <main>
+      <div id="warns" class="warns"></div>
 
-      <section id="leak">
-        <h2>8. Leakage</h2>
-        <ul>
-          <li><b>Subthreshold</b> from the same current equation at V<sub>GS</sub> = 0.</li>
-          <li><b>Gate direct tunnelling</b>: Schuegraf–Hu for the SiO<sub>2</sub> layer with a WKB factor for a high-k layer. 1.5 nm SiO<sub>2</sub> at 1 V gives about 3.5 A/cm², in the range of published measurements, and the current drops about one decade per 0.2 nm.</li>
-          <li><b>Junction band-to-band tunnelling</b> and <b>GIDL</b> at the drain edge (order-of-magnitude).</li>
-          <li><b>SRH generation</b> in the drain depletion volume, q·n<sub>i</sub>·W<sub>dep</sub>·A/(2τ<sub>g</sub>), which dominates at high temperature and high voltage.</li>
-        </ul>
-        <p>The simulator shows which component dominates. For the default device it is subthreshold; below about 1.4 nm oxide, gate tunnelling takes over; above about 6×10<sup>18</sup> cm<sup>−3</sup> channel doping, junction tunnelling does.</p>
-      </section>
-
-      <section id="bv">
-        <h2>9. Breakdown and hot carriers</h2>
-        <p>Breakdown is computed for each mechanism separately, and the lowest one sets BV<sub>dss</sub> (gate, source and body grounded). The simulator draws all of them as bars, so you see not only the number but what limits it.</p>
-        <ul>
-          <li><b>Junction avalanche</b>: the ionisation integral ∫α dx = 1 with Van Overstraeten–de Man coefficients, over the field of a cylindrical junction edge (radius = junction depth). Within 1% of a full 1D Poisson field profile with the same coefficients.</li>
-          <li><b>Gated-diode avalanche</b>: the same integral with the gate-induced vertical field added at the drain edge.</li>
-          <li><b>Zener and GIDL</b>: the tunnelling current reaches a criterion current (1 µA/µm by default; it is an input, since every company uses its own spec).</li>
-          <li><b>Punch-through</b>: the V<sub>GS</sub> = 0 channel current reaches the criterion. Within about 10% of the 2D Poisson solver for short channels; one longer, more heavily doped case is 49% high and is among the known failures (section 12).</li>
-          <li><b>Hot carriers and snapback</b>: substrate current from Hu's model; snapback when I<sub>sub</sub>·R<sub>sub</sub> forward-biases the source junction by 0.7 V.</li>
-        </ul>
-        <p>Against a 2D Poisson solution with ionisation integrals taken along field lines, the compact avalanche voltage agrees within about 20% on the devices tested.</p>
-      </section>
-
-      <section id="hv">
-        <h2>10. The 30 V-class HV device</h2>
-        <p>High-voltage transistors (for example the ones that pass program and erase voltages in non-volatile memory) look different: a thick oxide (here 65 nm), a long channel, and a drain built to spread the field.</p>
-        <ul>
-          <li><b>Three-layer drain</b>: a shallow, lightly doped drift (LDD) from under the gate; an n<sup>+</sup> placed a drift length away from the gate edge; and a deep, lightly doped layer (DDD) wrapping the n<sup>+</sup> and reaching toward the gate.</li>
-          <li><b>Drift resistance</b>: parallel sheets, thinned by the drift–body depletion at the local bias (a JFET effect), with velocity saturation capped at the Kirk current q·N·v<sub>sat</sub>·t, plus space-charge-limited conduction beyond it. The low-current value agrees with a 2D resistor within 4% over twelve structures.</li>
-          <li><b>Breakdown</b> at three places: the gate edge and drift surface (a quasi-2D surface Poisson model including the gate field and the depletion from the body below, the RESURF effect), the LDD corner, and the bottom corner of the n<sup>+</sup>/DDD. Against 103 2D Poisson + ionisation runs, the error is 7–17% rms depending on the data set.</li>
-          <li><b>Pass voltage</b>: with the gate at V<sub>DD</sub>, the output can only rise until V<sub>G</sub> − V<sub>out</sub> = V<sub>th</sub>(V<sub>SB</sub> + V<sub>out</sub>); the body effect is what makes this matter.</li>
-          <li><b>Field transistor</b>: poly running over the isolation oxide can invert the surface between neighbouring n<sup>+</sup> regions; its threshold is shown and flagged if close to V<sub>DD</sub>.</li>
-          <li><b>R<sub>on</sub>·A</b> (on-resistance × footprint), the standard figure of merit traded against breakdown voltage.</li>
-        </ul>
-        <p>The example HV device gives BV<sub>dss</sub> ≈ 37 V (limited at the n<sup>+</sup>/DDD corner; a live 2D run gives 39 V), V<sub>th</sub> ≈ 0.92 V and R<sub>on</sub>·A ≈ 149 mΩ·mm². The values are illustrative, not from any real process.</p>
-      </section>
-
-      <section id="opt">
-        <h2>11. Design optimizer</h2>
-        <p>The optimizer is NSGA-II, a genetic algorithm that keeps a population of designs and evolves it toward the <b>Pareto front</b>: the set of designs where you cannot improve one goal without making the other worse.</p>
-        <ul>
-          <li>Toggle which inputs it may change; everything else stays at your current values.</li>
-          <li>Pick one or two goals and any number of limits (e.g. V<sub>th</sub> ≥ 0.25 V, oxide field ≤ 6 MV/cm, BV ≥ 1.2·V<sub>DD</sub>).</li>
-          <li>Optionally require robustness to gate-length variation: each candidate is judged at its worst ±ΔL corner.</li>
-          <li>Limits that none of the selected knobs can move are detected before the run and reported, instead of silently blocking it.</li>
-        </ul>
-        <p>Optimizers are good at finding where a model is weakest, so a chosen design can be re-checked against the 2D solvers with one click, and it is flagged if it sits outside the range where the fitted parts of the model were checked.</p>
-      </section>
-
-      <section id="verify">
-        <h2>12. How it was checked</h2>
-        <p>The guiding rule: <b>compare against something that does not reuse the model's own equations</b>, and write down the expected result and tolerance <i>before</i> running. Several independent reference solvers were written for this:</p>
-        <div class="tablewrap"><table>
-          <tr><th>Reference</th><th>Used for</th></tr>
-          <tr><td>Exact 1D MOS charge (integrated Poisson)</td><td>Threshold, body effect, inversion charge</td></tr>
-          <tr><td>1D nonlinear Poisson for a pn junction</td><td>Junction capacitance, avalanche field profile</td></tr>
-          <tr><td>2D Laplace (finite volume)</td><td>Gate fringe and plug-to-gate capacitance</td></tr>
-          <tr><td>2D resistor</td><td>Overlap/spreading resistance, HV drift resistance</td></tr>
-          <tr><td>2D nonlinear Poisson (LV and HV cross-sections)</td><td>Short-channel effects, punch-through, avalanche along field lines</td></tr>
-        </table></div>
-        <p>On top of that, a <b>trend matrix</b>: for every input, the expected direction of every output (up, down, or no change) was written from physics before running the model, then checked over a sweep. It has 56 rows and 386 graded cells. Writing the expectations first is what caught most of the real errors, such as a missing short-channel term in the swing, or a capacitance that rose when a grounded plug moved <i>away</i> from the gate.</p>
-        <p>The full suite has 302 tests: 293 pass, 5 report a number without a pass/fail criterion, and 4 fail. The failures are known model limitations, kept visible rather than tuned away. You can run the whole suite yourself on the <a href="tests.html">test page</a> (the quick run takes about a minute).</p>
-      </section>
-
-      <section id="limits">
-        <h2>13. Known limitations</h2>
-        <ul>
-          <li><b>Inversion charge is over-estimated by 25–45%</b> in strong inversion compared with the exact 1D solution, because threshold is defined at ψ<sub>s</sub> = 2φ<sub>F</sub>. I<sub>on</sub> is likely high by a similar amount.</li>
-          <li><b>The CLM coefficient is not fitted.</b> Poisson's equation fixes charge and potential, not how carriers move, so it cannot calibrate saturation current or output conductance; that would need a drift-diffusion solver or measured I–V curves.</li>
-          <li><b>No calibration to a real process.</b> Mobility, strain, halo profiles and quantum effects are textbook or absent. The fitted constants are fitted to this project's own 2D solvers, which use rectangular junctions and uniform doping.</li>
-          <li><b>HV device</b>: no short-channel current model (punch-through is reported as a conservative 1D bound instead), and no impact ionisation in the drift region, so on-state safe operating area is not covered.</li>
-          <li>Heavily doped (10<sup>20</sup>) silicon resistivity is 22% low against Masetti's data, and the avalanche coefficients give a breakdown 36% above Sze's empirical fit at 10<sup>17</sup> cm<sup>−3</sup>.</li>
-        </ul>
-        <p>Treat outputs as trend and sensitivity estimates. If you have measured or TCAD I–V curves, they are the right thing to calibrate against.</p>
-        <div class="btns">
-          <a class="btn primary" href="simulator.html">Open the simulator →</a>
-          <a class="btn" href="tests.html">Run the verification tests</a>
+      <section class="kpis">
+        <div class="panel">
+          <h3><span>DC characteristics</span> <span class="note">per µm of W</span></h3>
+          <div class="hero"><b id="h-ion">–</b><span>µA/µm I<sub>on</sub> at V<sub>GS</sub>=V<sub>DS</sub>=V<sub>DD</sub></span></div>
+          <div class="kv" id="kv-dc"></div>
+        </div>
+        <div class="panel">
+          <h3><span>Parasitics</span> <span class="note">whole device</span></h3>
+          <div class="hero"><b id="h-cgg">–</b><span>fF C<sub>gg</sub> (inversion)</span></div>
+          <div class="kv" id="kv-par"></div>
+        </div>
+        <div class="panel">
+          <h3><span>Speed</span></h3>
+          <div class="hero"><b id="h-tau">–</b><span>ps intrinsic C<sub>gg</sub>V<sub>DD</sub>/I<sub>on</sub></span></div>
+          <div class="kv" id="kv-spd"></div>
         </div>
       </section>
-    </article>
+
+      <section class="panel" id="hf">
+        <h3><span>Breakdown &amp; hot carriers</span> <span class="note" id="hf-note">drain–source, gate and body at source</span></h3>
+        <div class="two">
+          <div>
+            <div class="hero"><b id="h-bv">–</b><span>V BV<sub>dss</sub> · <span id="h-bvmech"></span></span></div>
+            <div class="kv" id="kv-hf"></div>
+          </div>
+          <div>
+            <div class="bars" id="bvbars"></div>
+            <p class="hint" style="font-size:11.5px;color:var(--muted);margin:8px 0 0">Each bar is the drain voltage at which that mechanism alone breaks the device (current mechanisms use the criterion set under Operating point). The shortest bar sets BV<sub>dss</sub>; the dashed line marks V<sub>DD</sub>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3><span>Cross-section along L</span> <span class="note" id="xs-note">drawn to scale except gate dielectric</span></h3>
+        <div class="xs-wrap"><svg id="xs" role="img" aria-label="Device cross-section"></svg></div>
+        <div class="legend" id="xs-legend"></div>
+      </section>
+
+      <section class="two">
+        <div class="panel">
+          <h3><span>Capacitance breakdown</span> <span class="note">fF · inversion (on) state</span></h3>
+          <div class="bars" id="cbars"></div>
+          <div class="sum"><span>C<sub>gg</sub> on / off</span><b id="csum">–</b></div>
+        </div>
+        <div class="panel">
+          <h3><span>Series resistance per side</span> <span class="note">Ω · source = drain</span></h3>
+          <div class="bars" id="rbars"></div>
+          <div class="sum"><span>R<sub>S</sub> = R<sub>D</sub> · I<sub>on</sub> loss vs. R<sub>S</sub>=0</span><b id="rsum">–</b></div>
+        </div>
+      </section>
+
+      <section class="two">
+        <div class="panel">
+          <h3><span>I<sub>D</sub>–V<sub>GS</sub></span> <span class="note">log scale, µA/µm</span></h3>
+          <div class="chart" id="c-idvg"></div>
+        </div>
+        <div class="panel">
+          <h3><span>I<sub>D</sub>–V<sub>DS</sub></span> <span class="note">µA/µm, series R included</span></h3>
+          <div class="chart" id="c-idvd"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3><span>Parameter sweep</span> <span class="note">all other inputs held at current values · dashed line = current value</span></h3>
+        <div class="ctl">
+          <label for="sw-p">Sweep</label><select id="sw-p"></select>
+          <label for="sw-m">Plot</label><select id="sw-m"></select>
+        </div>
+        <div class="chart" id="c-sweep"></div>
+      </section>
+
+      <section class="panel" id="opt">
+        <h3><span>Design optimizer</span> <span class="note">NSGA-II genetic algorithm · switch on only the knobs you want it to move</span></h3>
+        <div class="opt-grid">
+          <div>
+            <div class="opt-block">
+              <h4>Knobs to optimize <span id="opt-count"></span></h4>
+              <div class="opt-vars" id="opt-vars"></div>
+              <p class="hint">Other inputs stay at their current values in the panel on the left. Default bounds are the ranges where the calibrated parts of the model were checked.</p>
+            </div>
+            <div class="opt-block">
+              <h4>Goals</h4>
+              <div class="orow"><span>X</span><select id="opt-o1" aria-label="First goal"></select><select id="opt-d1" aria-label="First goal direction"><option value="min">minimise</option><option value="max">maximise</option></select></div>
+              <div class="orow"><span>Y</span><select id="opt-o2" aria-label="Second goal"></select><select id="opt-d2" aria-label="Second goal direction"><option value="min">minimise</option><option value="max">maximise</option></select></div>
+            </div>
+            <div class="opt-block">
+              <h4>Limits</h4>
+              <div id="opt-cons"></div>
+              <button class="btn" type="button" id="opt-addc">Add limit</button>
+            </div>
+            <div class="opt-block">
+              <h4>Search</h4>
+              <div class="srow"><label for="opt-dl">L<sub>g</sub> process variation ± (nm, judged at the worst corner)</label><input id="opt-dl" type="text" inputmode="decimal" value="0"></div>
+              <div class="srow"><label for="opt-pop">Population</label><input id="opt-pop" type="text" inputmode="numeric" value="60"></div>
+              <div class="srow"><label for="opt-gen">Generations</label><input id="opt-gen" type="text" inputmode="numeric" value="60"></div>
+              <div class="btnrow"><button class="btn primary" type="button" id="opt-run">Run optimizer</button><button class="btn" type="button" id="opt-stop" disabled>Stop</button><span class="ostat" id="opt-status"></span></div>
+            </div>
+          </div>
+          <div>
+            <div class="opt-legend" id="opt-legend"></div>
+            <div class="chart" id="opt-plot"></div>
+            <p class="hint" id="opt-hint">Run the optimizer, then click a point on the front to inspect it.</p>
+            <div id="opt-sel"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <details class="model">
+          <summary>Model equations and assumptions</summary>
+          <div class="cols">
+            <div>
+              <h4>Gate stack and threshold</h4>
+              <p><code>EOT = t<sub>IL</sub>·3.9/k<sub>IL</sub> + t<sub>HK</sub>·3.9/k<sub>HK</sub></code>. Inversion capacitance uses <code>T<sub>oxe</sub> = EOT + 0.4 nm</code> (inversion-charge centroid) + poly-depletion width·3.9/11.7, evaluated at V<sub>DD</sub>.</p>
+              <p>Long-channel <code>V<sub>th</sub> = V<sub>FB</sub> + 2φ<sub>F</sub> + qN<sub>A</sub>W<sub>dmax</sub>/C<sub>ox</sub></code>; n<sup>+</sup> poly gives <code>φ<sub>ms</sub> = −(E<sub>g</sub>/2+φ<sub>F</sub>)</code>, metal gives <code>φ<sub>m</sub> − (χ + E<sub>g</sub>/2 + φ<sub>F</sub>)</code>, χ = 4.05 eV. No fixed oxide charge, uniform channel doping (no halo profile).</p>
+              <p>Short-channel roll-off and DIBL, BSIM3 form: <code>ΔV<sub>th</sub> = −DVT0·θ(DVT1)·(V<sub>bi</sub>−2φ<sub>F</sub>) − ETA0·θ(DSUB)·V<sub>DS</sub></code>, <code>θ(D) = e<sup>−D·L<sub>eff</sub>/2λ</sup> + 2e<sup>−D·L<sub>eff</sub>/λ</sup></code>, <code>λ = √(ε<sub>Si</sub>/ε<sub>ox</sub>·EOT·W<sub>dmax</sub>)·(X<sub>j,ext</sub>/W<sub>dmax</sub>)<sup>0.227</sup></code>. DVT0 = 4.08, DVT1 = 0.602, ETA0 = 0.695, DSUB = 1.10 and the X<sub>j</sub> exponent were fitted to a 2D Poisson solver (see tests) and checked on held-out devices. Subthreshold swing factor with the Taur–Ning short-channel term: <code>n = m·[1 + (11·EOT/W<sub>dmax</sub>)·e<sup>−πL<sub>eff</sub>/2(W<sub>dmax</sub>+3EOT)</sup>]</code>.</p>
+              <h4>Drain current</h4>
+              <p>BSIM3-style single-piece model: smoothed V<sub>gsteff</sub> covering subthreshold to strong inversion, body factor <code>m = 1 + 3T<sub>ox</sub>/W<sub>dmax</sub></code>, velocity saturation with <code>E<sub>sat</sub> = 2v<sub>sat</sub>/μ<sub>eff</sub></code>, v<sub>sat</sub>(T) = 2.4×10<sup>7</sup>/(1+0.8e<sup>T/600</sup>) cm/s. Channel-length modulation is not modeled beyond DIBL.</p>
+              <p>Universal mobility: <code>μ<sub>eff</sub> = 540·(T/300)<sup>−1.5</sup> / [1 + (E<sub>eff</sub>/1 MV/cm)<sup>1.85</sup>]</code>, <code>E<sub>eff</sub> = (V<sub>gsteff</sub> + 2V<sub>th</sub> + 0.2)/(6T<sub>oxe</sub>)</code>. No strain, no Coulomb term at low field.</p>
+              <p>Series R is solved self-consistently: <code>I = f(V<sub>GS</sub>−IR<sub>S</sub>, V<sub>DS</sub>−2IR<sub>S</sub>)</code> by bisection.</p>
+            </div>
+            <div>
+              <h4>Capacitance</h4>
+              <ul>
+                <li>Channel: <code>C<sub>inv</sub>·W·L<sub>eff</sub></code> (off state: C<sub>ox</sub> in series with depletion).</li>
+                <li>Overlap: <code>C<sub>ox</sub>·W·L<sub>ov</sub></code> per side.</li>
+                <li>Outer fringe (Shrivastava–Fitzpatrick quarter-circle arcs), split by medium, with the plug cutting the arcs only over the width it covers (N<sub>p</sub>·CD): <code>(2W/π)ε<sub>0</sub>[k<sub>sp</sub>ln(W<sub>sp</sub>/t<sub>ox</sub>) + k<sub>ILD</sub>ln(r<sub>max</sub>/W<sub>sp</sub>)]</code>, r<sub>max</sub> = min(H<sub>g</sub>, plug gap).</li>
+                <li>Inner fringe <code>(2ε<sub>Si</sub>W/π)ln(1+X<sub>j,ext</sub>/2t<sub>ox</sub>)</code>, counted only in the off state (screened by inversion).</li>
+                <li>Plug–gate: parallel plate over facing height min(H<sub>g</sub>, H<sub>plug</sub>) × plug CD, spacer and ILD in series, plus Palmer edge fringes for the plug's width and height edges, added per edge, plus coupling from the plug above the gate top to the gate top surface (saturates one gap above the gate).</li>
+                <li>Junction: abrupt one-sided; bottom (deep S/D and extension to well) plus channel-side sidewall to N<sub>A</sub>. The other three sidewalls are assumed STI-bounded. Drain uses the large-signal average over 0→V<sub>DD</sub> reverse bias.</li>
+              </ul>
+              <h4>Resistance (per side)</h4>
+              <ul>
+                <li>Resistivity from Caughey–Thomas electron mobility, full ionization.</li>
+                <li>Channel → extension front end: over the overlap the gate-induced accumulation sheet (at V<sub>GS</sub> = V<sub>DD</sub>) and the extension sheet form a two-sheet transmission line, in parallel with Ng–Lynch edge spreading <code>(2ρ<sub>ext</sub>/π)ln(0.75X<sub>j,ext</sub>/2 nm)</code>. Coupling resistivity 0.2·ρ<sub>ext</sub>X<sub>j,ext</sub> calibrated to a 2D resistor solver. R<sub>S</sub> falls for the first few nm of overlap and then rises again.</li>
+                <li>Extension under spacer: <code>ρ<sub>ext</sub>W<sub>sp</sub>/(W·X<sub>j,ext</sub>)</code>. Deep S/D sheet from spacer edge to plug.</li>
+                <li>Contact: <code>ρ<sub>c</sub> ∝ exp(φ<sub>B</sub>/E<sub>0</sub>)</code>, <code>E<sub>0</sub> = E<sub>00</sub>coth(E<sub>00</sub>/kT)</code>, m* = 0.3m<sub>0</sub>; prefactor calibrated to ρ<sub>c</sub> = 1×10<sup>−7</sup> Ω·cm² at 1×10<sup>20</sup> cm<sup>−3</sup>, φ<sub>B</sub> = 0.6 eV, 300 K. Plug footprint is CD², no transfer-length or current-crowding correction.</li>
+                <li>Gate: distributed <code>R<sub>g</sub> = R<sub>sh</sub>·W/(3L<sub>g</sub>)</code>, contacted at one end.</li>
+              </ul>
+              <h4>Speed metrics</h4>
+              <ul>
+                <li>Intrinsic delay <code>C<sub>gg</sub>V<sub>DD</sub>/I<sub>on</sub></code>.</li>
+                <li>Discharge delay <code>t<sub>pHL</sub> = C<sub>drain</sub>V<sub>DD</sub>/(2I<sub>eff</sub>)</code>, <code>I<sub>eff</sub> = [I(V<sub>DD</sub>,V<sub>DD</sub>/2) + I(V<sub>DD</sub>/2,V<sub>DD</sub>)]/2</code> (Na et al., IEDM 2002). Gate held at V<sub>DD</sub>, so no Miller multiplication; that enters with the inverter.</li>
+                <li><code>f<sub>T</sub> = g<sub>m</sub>/2πC<sub>gg</sub></code>; <code>f<sub>max</sub> = f<sub>T</sub>/2√[g<sub>ds</sub>(R<sub>g</sub>+R<sub>S</sub>) + 2πf<sub>T</sub>R<sub>g</sub>C<sub>gd</sub>]</code>.</li>
+              </ul>
+              <h4>Body bias, oxide charge, output conductance</h4><p>Body effect through ψ<sub>s</sub> = 2φ<sub>F</sub> + V<sub>SB</sub> in V<sub>th</sub>, the body factor and the SCE length. Fixed oxide charge shifts V<sub>FB</sub> by −qQ<sub>f</sub>/C<sub>ox</sub>; interface traps add qD<sub>it</sub> to the subthreshold capacitance. Channel-length modulation ΔL = l·ln[1 + (V<sub>DS</sub> − V<sub>DSat</sub>)/(l·E<sub>sat</sub>)], l = √(3·EOT·X<sub>j,ext</sub>), above threshold only; current × (1 + ΔL/L<sub>eff</sub>). The strength coefficient is an input (1 = textbook Ko form, not fitted; 0 turns CLM off). With CLM the default I<sub>on</sub> is about 27% higher than without.</p>
+<h4>Impact ionisation and breakdown</h4><ul><li>Substrate current (Chan/Hu): I<sub>sub</sub>/I<sub>D</sub> = (A<sub>i</sub>/B<sub>i</sub>)(V<sub>DS</sub>−V<sub>DSat</sub>)e<sup>−B<sub>i</sub>l/(V<sub>DS</sub>−V<sub>DSat</sub>)</sup>, l = 0.22·t<sub>ox</sub><sup>1/3</sup>X<sub>j</sub><sup>1/2</sup>; drain current includes the multiplication.</li><li>Junction avalanche: ionisation integral (Van Overstraeten–de Man coefficients with their temperature factor) over the field of a cylindrical junction edge of radius X<sub>j</sub>.</li><li>Zener: junction band-to-band current reaches the criterion. Gated diode: GIDL reaches the criterion, or avalanche with the gate-induced field (V<sub>DG</sub>−E<sub>g</sub>)/(3·EOT) added over √(3·EOT·X<sub>j,ext</sub>).</li><li>Punch-through: V<sub>GS</sub> = 0 channel current (with DIBL) reaches the criterion.</li><li>On-state snapback: I<sub>sub</sub>·R<sub>sub</sub> = 0.7 V. SRH generation q·n<sub>i</sub>·W<sub>dep</sub>·A/(2τ<sub>g</sub>) is added to I<sub>off</sub>. Pelgrom σV<sub>th</sub> = A<sub>VT</sub>/√(W·L<sub>eff</sub>), A<sub>VT</sub> ≈ 1 mV·µm per nm EOT × (N<sub>A</sub>/10¹⁸)<sup>¼</sup>.</li></ul>
+<h4>HV device (30 V class)</h4><ul><li>Drain: shallow LDD drift from under the gate to an n⁺ placed a drift length L<sub>off</sub> from the gate edge, and a deep n⁻ (DDD) under the n⁺ that overhangs toward the gate by O<sub>ddd</sub>.</li><li>Drift resistance: parallel sheets (LDD, and LDD + DDD over the overhang) thinned by the drift–well depletion at the local bias (JFET). Current per width J(E) = G·E/(1 + E/E<sub>s</sub>) + κ·S(E): ohmic with velocity saturation up to the Kirk current q·N·v<sub>sat</sub>·t, plus space-charge-limited conduction beyond it (κ = 2ε·v<sub>sat</sub>·t/ℓ). The overhang entry adds a two-sheet transmission-line term. Low-current drift R agrees with a 2D resistor within 4%.</li><li>Breakdown: gate-edge / drift-surface avalanche from a quasi-2D surface Poisson model (gate field, drift depletion, RESURF from the body), the LDD channel-side corner, and the n⁺/DDD bottom corner (layered cylindrical junction). Checked against a 2D Poisson + field-line ionisation reference: rms 7–17% by data set for LDD ≥ 3 × N<sub>A</sub> and oxide ≥ 35 nm.</li><li>Punch-through: no HV short-channel current model (V<sub>th</sub> is long-channel). A 1D reach-through voltage across L<sub>eff</sub> (drift included) is reported as a conservative bound, below the 2D onset on all 48 reference devices, and is kept out of BV<sub>dss</sub>.</li><li>BV<sub>dss</sub> is defined with the body at the source (V<sub>SB</sub> = 0). Pass voltage: V<sub>DD</sub> − V<sub>out</sub> = V<sub>th</sub>(V<sub>SB</sub> + V<sub>out</sub>). Field transistor: n⁺ poly over the field oxide with the channel-stop doping.</li></ul>
+<h4>Layout footprint</h4><p>Area per device pitch <code>(L<sub>g</sub> + 2·L<sub>sd</sub> + S<sub>L</sub>)·(W + S<sub>W</sub>)</code>, with the isolation space shared half-and-half with neighbours. In contact-rule mode <code>L<sub>sd</sub> = plug gap + CD + enclosure</code>, so shrinking the plug gap or CD also shrinks the active, the drain junction and the footprint.</p><h4>Leakage</h4><ul><li>Gate direct tunnelling: Schuegraf–Hu for the SiO₂ layer (φ<sub>B</sub> 3.1 eV, m* 0.40 m₀) with the WKB attenuation of a HfO₂-like high-k layer (1.5 eV, 0.18 m₀); oxide voltage split by EOT. On state: gate-to-channel over W·L<sub>eff</sub>. Off state: gate-to-drain through the overlap.</li><li>Junction band-to-band tunnelling (Sze & Ng) at the drain extension–channel sidewall and the S/D bottom, using the peak junction field at V<sub>DD</sub>.</li><li>GIDL: same tunnelling expression with the Chan et al. surface field (V<sub>DG</sub> − E<sub>g</sub>)/(3·EOT) over the overlap plus 2 nm. Order-of-magnitude only.</li></ul>
+<p>Geometric clamps such as min(H<sub>g</sub>, H<sub>plug</sub>) give slope kinks (not jumps) in sweeps. Not modeled: quantum V<sub>th</sub> shift, halo/retrograde profiles, narrow-width effects, self-heating. Treat outputs as trend and sensitivity estimates, not sign-off numbers.</p>
+            </div>
+          </div>
+        </details>
+      </section>
+    </main>
   </div>
-</main>
-<footer>© Jae Hyun Ryu · Personal project for learning and exploration; not affiliated with or endorsed by any employer. Parameter values are illustrative.</footer>
+</div>
+
+<script src="nmos_model.js"></script>
+<script src="optimizer.js"></script>
+<script src="tests/reference_solvers.js"></script>
 <script>
-// highlight the current section in the contents list
-(function(){
-  var links=[].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
-  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
-  function on(){ var y=window.scrollY+window.innerHeight*0.3, cur=-1;
-    secs.forEach(function(s,i){ if(s&&s.offsetTop<=y) cur=i; });
-    links.forEach(function(a,i){ a.classList.toggle('active',i===cur); }); }
-  window.addEventListener('scroll',on,{passive:true}); on();
+(()=>{
+"use strict";
+/* ================= model (shared with tests/) ================= */
+const {GROUPS,DEF,PRESETS,paramsFor,model}=window.NMOS;
+const nm=1e-7;
+let P={...DEF};
+let PARAMS=paramsFor(P.dev);          // ranges and visible inputs of the current device type
+
+/* ================= formatting ================= */
+const sup={"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","+":""};
+function fmt(v,d=3){
+  if(!isFinite(v)) return "–";
+  const a=Math.abs(v);
+  if(a!==0&&(a>=1e5||a<1e-3)){const [mm,ee]=v.toExponential(d-1).split("e");return mm+"×10"+String(+ee).split("").map(c=>sup[c]).join("");}
+  if(a>=100) return v.toFixed(Math.max(0,d-3));
+  return (+v.toPrecision(d)).toString();
+}
+function fmtIn(v,d){
+  if(d.log&&(v>=1e4||v<1e-2)){const [mm,ee]=v.toExponential(2).split("e");return (+mm)+"e"+(+ee);}
+  if(d.int) return String(Math.round(v));
+  return (+v.toPrecision(4)).toString();
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ================= input panel ================= */
+const inputsEl=document.getElementById("inputs");
+function buildInputs(){
+  let html="";
+  GROUPS.forEach(g=>{
+    html+=`<section class="grp"><div class="grp-h"><h2>${g.name}</h2><span class="derived" id="der-${g.id}"></span></div>`;
+    if(g.id==="stack"){
+      html+=`<div class="seg" role="group" aria-label="Gate electrode"><button type="button" data-gate="poly">n⁺ poly-Si gate</button><button type="button" data-gate="metal">Metal gate</button></div>`;
+    }
+    if(g.id==="layout"){
+      html+=`<div class="seg" role="group" aria-label="Active length"><button type="button" data-lsd="manual">Active length: as entered</button><button type="button" data-lsd="auto">From contact rule</button></div>`;
+    }
+    PARAMS.filter(d=>d.g===g.id).forEach(d=>{
+      html+=`<div class="row" id="row-${d.k}"><label for="in-${d.k}">${d.l}${d.u?`<span class="u">${d.u}</span>`:""}</label>
+        <input type="text" id="in-${d.k}" inputmode="decimal" spellcheck="false" autocomplete="off">
+        <input type="range" id="sl-${d.k}" min="0" max="1000" step="1" aria-label="${esc(d.l)} slider"></div>`;
+    });
+    html+=`</section>`;
+  });
+  inputsEl.innerHTML=html;
+  PARAMS.forEach(d=>{
+    const t=document.getElementById("in-"+d.k), s=document.getElementById("sl-"+d.k);
+    t.addEventListener("change",()=>{
+      const v=parseFloat(t.value.replace(/,/g,""));
+      if(!isFinite(v)||v<d.min*0.999999||v>d.max*1.000001){t.classList.add("bad");t.title=`Enter a value from ${fmtIn(d.min,d)} to ${fmtIn(d.max,d)}`;return;}
+      t.classList.remove("bad");t.title="";
+      P[d.k]=d.int?Math.round(v):v; syncInput(d); schedule();
+    });
+    s.addEventListener("input",()=>{
+      const f=s.value/1000;
+      let v=d.log?Math.pow(10,Math.log10(d.min)+f*(Math.log10(d.max)-Math.log10(d.min))):d.min+f*(d.max-d.min);
+      if(d.log) v=+v.toPrecision(3); else if(d.int) v=Math.round(v); else v=Math.round(v/d.st)*d.st;
+      v=+v.toPrecision(6);
+      P[d.k]=v; t.value=fmtIn(v,d); t.classList.remove("bad"); schedule();
+    });
+  });
+  inputsEl.querySelectorAll("[data-gate]").forEach(b=>b.addEventListener("click",()=>{P.gate=b.dataset.gate;syncAll();schedule();}));
+  inputsEl.querySelectorAll("[data-lsd]").forEach(b=>b.addEventListener("click",()=>{P.lsdAuto=b.dataset.lsd==="auto";syncAll();schedule();}));
+}
+function syncInput(d){
+  const t=document.getElementById("in-"+d.k), s=document.getElementById("sl-"+d.k), v=P[d.k];
+  t.value=fmtIn(v,d);
+  const f=d.log?(Math.log10(v)-Math.log10(d.min))/(Math.log10(d.max)-Math.log10(d.min)):(v-d.min)/(d.max-d.min);
+  s.value=Math.round(Math.min(1,Math.max(0,f))*1000);
+}
+function syncAll(){
+  PARAMS.forEach(d=>{syncInput(d); document.getElementById("row-"+d.k).hidden = d.show?!d.show(P):false;});
+  inputsEl.querySelectorAll("[data-gate]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.gate===P.gate)));
+  inputsEl.querySelectorAll("[data-lsd]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.lsd==="auto")===!!P.lsdAuto)));
+  // in contact-rule mode the active length is derived: show it, lock the input
+  const auto=!!P.lsdAuto, li=document.getElementById("in-Lsd"), ls=document.getElementById("sl-Lsd");
+  li.disabled=ls.disabled=auto; if(auto) li.value=fmtIn(P.dpg+P.CD+P.eAct,{});
+  li.title=auto?"Set by the contact rule: plug gap + CD + enclosure":"";
+}
+
+/* ================= outputs ================= */
+const $=id=>document.getElementById(id);
+function kv(el,rows){el.innerHTML=rows.map(r=>`<div class="k">${r[0]}${r[3]?`<small>${r[3]}</small>`:""}</div><div class="v">${r[1]}<small>${r[2]||""}</small></div>`).join("");}
+
+function renderKPIs(M){
+  const Wum=M.W/1000;
+  $("h-ion").textContent=fmt(M.Ion*1e6/Wum,3);
+  kv($("kv-dc"),[
+    ["V<sub>th</sub> lin / sat",`${fmt(M.VthLin,3)} / ${fmt(M.VthSat,3)}`,"V",`V<sub>DS</sub> = 0.05 V / ${fmt(M.p.VDD,3)} V · long-channel ${fmt(M.VthL,3)} V`],
+    ["I<sub>off</sub> total",fmt(M.IoffTot*1e9/Wum,3),"nA/µm",`subthreshold ${fmt(M.Ioff*1e9/Wum,2)} · gate–drain tunnelling ${fmt(M.Iedt*1e9/Wum,2)} · GIDL ${fmt(M.Igidl*1e9/Wum,2)} · junction BTBT ${fmt(M.Ibtbt*1e9/Wum,2)} · SRH generation ${fmt(M.Igen*1e9/Wum,2)}`],
+    ["I<sub>on</sub>/I<sub>off</sub>",fmt(M.Ion/M.IoffTot,3),""],
+    ["I<sub>g</sub> on (gate tunnelling)",fmt(M.Igc*1e9/Wum,3),"nA/µm",`V<sub>ox</sub> ${fmt(M.VoxOn,3)} V at V<sub>GS</sub> = V<sub>DD</sub>`],
+    ["Subthreshold swing",fmt(M.SS,3),"mV/dec"],
+    ["DIBL",fmt(M.DIBL,3),"mV/V"],
+    ["R<sub>on</sub>·W",fmt(M.Ron*Wum,3),"Ω·µm","V<sub>DS</sub> = 0.05 V"],
+    ...(M.hv?[
+      ["Specific R<sub>on</sub>·A",fmt(M.RonA,3),"mΩ·mm²",`R<sub>on</sub> × footprint ${fmt(M.areaUm2,3)} µm²`],
+      ["Pass voltage at V<sub>G</sub> = V<sub>DD</sub>",fmt(M.Vpass,3),"V",`body effect: V<sub>G</sub> − V<sub>out</sub> = V<sub>th</sub>(V<sub>SB</sub> + V<sub>out</sub>) · gate needed to pass V<sub>DD</sub>: ${fmt(M.VgReq,3)} V`],
+      ["Field-transistor V<sub>th</sub>",fmt(M.VthFld,3),"V",`poly over ${fmt(M.p.tfox,3)} nm field oxide, channel stop ${fmtIn(M.p.Nfld,{log:1})} cm⁻³`]
+    ]:[])
+  ]);
+  $("h-cgg").textContent=fmt(M.CggOn*1e15,3);
+  kv($("kv-par"),[
+    ["C<sub>gg</sub> off",fmt(M.CggOff*1e15,3),"fF","depletion + fringes"],
+    ["C<sub>gd</sub> (extrinsic)",fmt(M.Cgd*1e15,3),"fF","overlap + outer fringe + plug"],
+    ["C<sub>j</sub> drain",fmt(M.CjAvg*1e15,3),"fF",`average 0→V<sub>DD</sub> · zero-bias ${fmt(M.Cj0*1e15,3)} fF`],
+    ["R<sub>S</sub> per side",fmt(M.Rs,3),"Ω",`R<sub>S</sub>·W = ${fmt(M.Rs*Wum,3)} Ω·µm`],
+    ["R<sub>g</sub> gate",fmt(M.Rg,3),"Ω",`R<sub>sh</sub> ${fmt(M.RshG,3)} Ω/□`],
+    ["ρ<sub>c</sub> contact",fmt(M.rhoc,3),"Ω·cm²"],
+    ["Footprint area",fmt(M.areaUm2,3),"µm²",`(L<sub>g</sub> + 2·L<sub>sd</sub> + S<sub>L</sub>) × (W + S<sub>W</sub>)${M.p.lsdAuto?" · L<sub>sd</sub> from contact rule":""}`],
+    ["I<sub>on</sub> per area",fmt(M.Ion*1e6/M.areaUm2,3),"µA/µm²",`whole device I<sub>on</sub> ${fmt(M.Ion*1e6,3)} µA`]
+  ]);
+  $("h-tau").textContent=fmt(M.tau*1e12,3);
+  kv($("kv-spd"),[
+    ["t<sub>pHL</sub> drain discharge",fmt(M.tpHL*1e12,3),"ps",`C<sub>drain</sub> ${fmt(M.Cdrain*1e15,3)} fF, I<sub>eff</sub> ${fmt(M.Ieff*1e6/Wum,3)} µA/µm`],
+    ["Gate RC  R<sub>g</sub>·C<sub>gg</sub>",fmt(M.tauG*1e12,3),"ps"],
+    ["g<sub>m</sub>",fmt(M.gm*1e6/Wum,3),"µS/µm"],
+    ["f<sub>T</sub>",fmt(M.fT/1e9,3),"GHz"],
+    ["f<sub>max</sub>",fmt(M.fmax/1e9,3),"GHz"],
+    ["Gate-oxide field",fmt(M.Eox/1e6,3),"MV/cm","SiO₂-equivalent at V<sub>DD</sub>"]
+  ]);
+  $("der-stack").textContent=`EOT ${fmt(M.EOT/nm,3)} · Tinv ${fmt(M.Toxe/nm,3)} nm`;
+  $("der-geo").textContent=`Leff ${fmt(M.LeffNm,3)} nm`+(M.hv?` · drift ${fmt(M.Loff,3)} nm`:"");
+  $("der-dop").textContent=`Wdep ${fmt(M.Wd/nm,3)} · λ ${fmt(M.lam/nm,3)} nm`;
+  $("der-plug").textContent=`ρc ${fmt(M.rhoc,2)} Ω·cm²`;
+  $("der-op").textContent=`vT ${fmt(M.vt*1000,3)} mV`;
+  $("der-layout").textContent=`${fmt(M.areaUm2,3)} µm² · margin ${fmt(M.actMargin,3)} nm`;
+  if(P.lsdAuto){ const li=document.getElementById("in-Lsd"); if(li) li.value=fmtIn(M.p.Lsd,{}); }
+}
+
+function renderWarns(M){
+  const p=M.p, w=[];
+  if(p.dpg<p.Wsp) w.push(`Plug-to-gate spacing (${p.dpg} nm) is smaller than the spacer width (${p.Wsp} nm): the plug lands on the spacer. S/D sheet resistance is set to zero and the plug–gate gap is all spacer dielectric.`);
+  if(M.actMargin<0) w.push(M.hv&&p.dpg<M.Loff+p.eAct?`Contact is not inside the n⁺: the plug starts ${fmt(p.dpg,3)} nm from the gate but the n⁺ begins at the drift length ${fmt(M.Loff,3)} nm (+ ${fmt(p.eAct,3)} nm enclosure). Move the plug out or shorten the drift.`:`Contact does not fit in the active: plug gap + CD + enclosure needs ${fmt(p.dpg+p.CD+p.eAct,3)} nm, but gate edge → STI is ${fmt(p.Lsd,3)} nm. Lengthen the active or switch to "From contact rule".`);
+  if(p.Np*p.CD>p.W) w.push(`${p.Np} plugs × ${p.CD} nm CD is wider than W = ${p.W} nm.`);
+  if(!M.hv&&p.Xjext>p.Xj) w.push(`Extension junction is deeper than the deep S/D junction.`);
+  if(M.hv){
+    if(p.Next<3*p.Na||p.tIL<35) w.push(`HV breakdown model was checked against the 2D solver for LDD doping ≥ 3 × channel doping and oxide ≥ 35 nm; this device is outside that (${p.Next<3*p.Na?`N<sub>ext</sub>/N<sub>A</sub> = ${fmt(p.Next/p.Na,2)}`:`oxide ${fmt(p.tIL,3)} nm`}). Use the 2D re-check.`);
+    if(Math.abs(p.Na/p.Nwell-1)>0.05) w.push(`Channel doping differs from the well doping. The HV 2D references use one uniform body doping, so the HV breakdown and punch-through models are unchecked for N<sub>A</sub> ≠ N<sub>well</sub>.`);
+    { const vrt=M.VRT; if(vrt<p.VDD) w.push(`Punch-through risk: the 1D reach-through bound (${fmt(vrt,3)} V) is below V<sub>DD</sub>. The HV model has no short-channel current, so I<sub>off</sub> and BV<sub>dss</sub> do not show punch-through; the bound is conservative (2D onset is usually well above it). Lengthen L<sub>g</sub> or raise N<sub>A</sub>, or check with the 2D re-check.`); }
+    if(M.VthFld<1.1*p.VDD) w.push(`Field-transistor V<sub>th</sub> (${fmt(M.VthFld,3)} V) is within 10% of V<sub>DD</sub>: a poly line at V<sub>DD</sub> over the field oxide can invert the surface between neighbouring n⁺ regions. Raise the channel-stop doping or the field-oxide thickness.`);
+    if(M.Eox>6e6&&M.Eox<=7e6) w.push(`Gate-oxide field ${fmt(M.Eox/1e6,3)} MV/cm: HV oxides are usually kept at or below about 5–6 MV/cm for long-term stress.`);
+  }
+  if(p.Next>p.Nsd) w.push(`Extension (LDD) doping ${fmtIn(p.Next,{log:1})} cm⁻³ is higher than the deep S/D doping ${fmtIn(p.Nsd,{log:1})} cm⁻³. In a normal LDD process the extension is the lighter implant.`);
+  if(p.Lg-2*p.Lov<10) w.push(`Effective channel length is below 10 nm (Lg − 2·overlap). The short-channel model is outside its range.`);
+  if(M.DIBL>150) w.push(`DIBL is ${fmt(M.DIBL,3)} mV/V: severe short-channel effect. Increase channel doping, thin the gate dielectric or lengthen Lg.`);
+  if(M.VthSat<0) w.push(`V<sub>th,sat</sub> is negative: the device is normally on.`);
+  if(M.Eox>7e6) w.push(`Gate dielectric field is ${fmt(M.Eox/1e6,3)} MV/cm (SiO₂-equivalent), above the ~7 MV/cm range usually allowed for reliability.`);
+  { const b=M.breakdown();
+    if(b.BVdss<=p.VDD) w.push(`V<sub>DD</sub> (${fmt(p.VDD,3)} V) is at or above BV<sub>dss</sub> (${fmt(b.BVdss,3)} V, ${b.mech}). The device breaks down in normal operation.`);
+    else if(b.BVdss<1.2*p.VDD) w.push(`BV<sub>dss</sub> (${fmt(b.BVdss,3)} V, ${b.mech}) leaves less than 20% margin above V<sub>DD</sub>.`);
+    if(!M.hv&&b.snapOn<1.1*p.VDD) w.push(`On-state snapback triggers at ${fmt(b.snapOn,3)} V, within 10% of V<sub>DD</sub>. Raise the substrate tie density (lower R<sub>sub</sub>) or reduce the drain field.`);
+    if(M.IsubRatio>0.1) w.push(`I<sub>sub</sub>/I<sub>D</sub> = ${fmt(M.IsubRatio,2)} at V<sub>GS</sub> = V<sub>DD</sub>/2: strong hot-carrier stress (hot-carrier lifetime scales roughly as (I<sub>sub</sub>/I<sub>D</sub>)<sup>−3</sup>). The local-field model overstates I<sub>sub</sub> below about 1.5 V, so treat values there as an upper bound.`); }
+  if(M.Igc>0.01*M.Ion) w.push(`Gate tunnelling current in the on state is ${fmt(M.Igc/M.Ion*100,2)}% of I<sub>on</sub>. Thicken the dielectric or use high-k.`);
+  { const leak=[["gate–drain tunnelling",M.Iedt],["GIDL",M.Igidl],["junction band-to-band tunnelling",M.Ibtbt]].sort((a,b)=>b[1]-a[1])[0];
+    if(leak[1]>M.Ioff) w.push(`Off-state leakage is dominated by ${leak[0]} (${fmt(leak[1]/M.IoffTot*100,2)}% of total I<sub>off</sub>), not by subthreshold conduction.`); }
+  $("warns").innerHTML=w.map(s=>`<div class="warn"><div>${s}</div></div>`).join("");
+}
+
+function bars(el,items,unit,total){
+  const max=Math.max(...items.map(i=>i.v),1e-30);
+  el.innerHTML=items.map(i=>`<div class="bar"><div class="lab">${i.l}${i.s?`<small>${i.s}</small>`:""}</div>
+    <div class="track"><div class="fill${i.alt?" alt":""}" style="width:${(i.v/max*100).toFixed(2)}%"></div></div>
+    <div class="val">${fmt(i.v,3)} <small>${total?Math.round(i.v/total*100)+"%":unit}</small></div></div>`).join("");
+}
+function renderBreakdown(M){
+  const f=1e15;
+  bars($("cbars"),[
+    {l:"Channel (inversion)",s:"C<sub>inv</sub>·W·L<sub>eff</sub>",v:M.Cch*f},
+    {l:"Overlap ×2",s:"gate over extension",v:2*M.Cov*f},
+    {l:"Outer fringe ×2",s:"through spacer + ILD",v:2*M.Cof*f},
+    {l:"Plug–gate ×2",s:`${M.p.Np} plug${M.p.Np>1?"s":""} per side`,v:2*M.Cpg*f},
+    {l:"Drain junction",s:"not in C<sub>gg</sub> · avg 0→V<sub>DD</sub>",v:M.CjAvg*f,alt:1},
+    {l:"Inner fringe ×2",s:"not in C<sub>gg</sub> on · off state only",v:2*M.Cif*f,alt:1}
+  ],"fF",M.CggOn*f);
+  // percentages relative to Cgg on; junction/inner fringe marked separately
+  $("csum").textContent=`${fmt(M.CggOn*f,3)} / ${fmt(M.CggOff*f,3)} fF`;
+  bars($("rbars"),[
+    {l:"Spreading + overlap",s:"channel → extension (accumulation)",v:M.Rspr},
+    ...(M.hv?[{l:"Drift (LDD + DDD)",s:"low-current value · JFET and quasi-saturation act at bias",v:M.Rdrift}]:[{l:"Extension",s:"under spacer",v:M.Rext}]),
+    {l:M.hv?"n⁺ sheet":"Deep S/D sheet",s:`${fmt(M.RshSD,3)} Ω/□, ${M.hv?"n⁺ edge":"spacer"} → plug`,v:M.Rsd},
+    {l:"Contact",s:"plug bottom / n⁺ Si",v:M.Rc},
+    {l:"Plug body",s:`${M.p.Np} × ${M.p.CD} nm square`,v:M.Rplug}
+  ],"Ω",M.Rs);
+  $("rsum").textContent=`${fmt(M.Rs,3)} Ω · −${fmt((1-M.Ion/M.Ion0)*100,3)}%`;
+}
+
+/* ================= breakdown & hot carriers ================= */
+function renderHF(M){
+  const b=M.breakdown(), V=M.p.VDD, Wum=M.W/1000;
+  $("h-bv").textContent=fmt(b.BVdss,3);
+  $("h-bvmech").textContent=b.mech;
+  kv($("kv-hf"),[
+    ["Snapback trigger (on state)",fmt(b.snapOn,3),"V",`V<sub>GS</sub> = V<sub>DD</sub>: I<sub>sub</sub>·R<sub>sub</sub> = 0.7 V · margin to V<sub>DD</sub> ${fmt(b.snapOn-V,3)} V`],
+    ["I<sub>sub</sub>/I<sub>D</sub> (hot-carrier stress)",fmt(M.IsubRatio,3),"",`V<sub>GS</sub> = V<sub>DD</sub>/2, V<sub>DS</sub> = V<sub>DD</sub> · peak lateral field ${fmt(M.EmaxHC/1e5,3)}×10⁵ V/cm`],
+    ["Drain current with avalanche",fmt(M.IonM*1e6/Wum,3),"µA/µm",`I<sub>on</sub> without it ${fmt(M.Ion*1e6/Wum,3)} µA/µm`],
+    ["Early voltage V<sub>A</sub>",fmt(M.VA,3),"V","I<sub>on</sub>/g<sub>ds</sub>, channel-length modulation + DIBL"],
+    ["σV<sub>th</sub> (Pelgrom)",fmt(M.sigmaVth*1000,3),"mV",`A<sub>VT</sub> ${fmt(M.AVT,2)} mV·µm · V<sub>th,sat</sub> − 3σ = ${fmt(M.VthSat-3*M.sigmaVth,3)} V`],
+    ["SRH generation leakage",fmt(M.Igen*1e9/Wum,3),"nA/µm",`τ<sub>g</sub> ${fmt(M.p.taug,3)} µs, drain depletion at ${fmt(V+M.Vsb,3)} V`],
+    M.hv?["Punch-through bound V<sub>RT</sub>",fmt(b.vpt,3),"V","1D reach-through across L<sub>eff</sub> with the drift; conservative, not in BV<sub>dss</sub>"]
+        :["Depletion reach-through (indicator)",fmt(b.vreach,3),"V","1D: drain and source depletion meet; not used for BV"]
+  ].filter(r=>!(M.hv&&/Snapback|I<sub>sub<\/sub>\/I/.test(r[0]))).concat(M.hv?[["Hot carriers / snapback","–","","HV: the Hu substrate-current model applies to the channel pinch-off; drift-region (Kirk) ionisation is not modelled"]]:[]));
+  const fin=v=>isFinite(v)&&v<499;
+  const mx=Math.max(...b.list.map(x=>Math.min(fin(x[1])?x[1]:Infinity,3*Math.max(b.BVdss,V))),V*1.1);
+  $("bvbars").innerHTML=b.list.map(([n,v])=>{const w=Math.min(v,mx)/mx*100, lim=v===b.BVdss;
+    return `<div class="bar"><div class="lab">${esc(n)}</div><div class="track" style="position:relative"><div class="fill${lim?"":" alt"}" style="width:${w.toFixed(1)}%"></div><div style="position:absolute;top:-3px;bottom:-3px;left:${(V/mx*100).toFixed(1)}%;border-left:2px dashed var(--ink2)"></div></div><div class="val">${fin(v)?fmt(v,3):"none"} <small>${fin(v)?"V":""}</small></div></div>`;}).join("");
+}
+
+/* ================= cross-section ================= */
+function renderXS(M){
+  const p=M.p, svg=$("xs");
+  const sti=50, half=p.Lg/2+p.Lsd;
+  const xL=-(half+sti), xR=half+sti, Wtot=xR-xL;
+  const u=Wtot/820; // ≈ nm per px at 820 px
+  const tox=Math.max(p.tIL+p.tHK,4*u);
+  const tIL=tox*(p.tIL/(p.tIL+p.tHK||1)), tHK=tox-tIL;
+  const topH=Math.max(p.Hp,p.Hg+tox)+26*u+14*u;
+  const hv=M.hv, Lo=M.Loff;
+  const botH=Math.max(p.Xj,p.Xjext,hv?p.Xjddd:0)+Math.max(70,40*u);
+  const yT=-topH, H=topH+botH;
+  svg.setAttribute("viewBox",`${xL} ${yT} ${Wtot} ${H}`);
+  const fs=11*u, st=`vector-effect="non-scaling-stroke"`;
+  const r=(x,y,w,h,c,extra="")=>`<rect x="${x}" y="${y}" width="${Math.max(w,0)}" height="${Math.max(h,0)}" style="fill:var(${c});stroke:var(--m-edge);stroke-width:.6" ${st} ${extra}/>`;
+  const txt=(x,y,s,anchor="middle",c="--ink2",extra="")=>`<text x="${x}" y="${y}" text-anchor="${anchor}" style="fill:var(${c});font:${fs}px var(--sans)" ${extra}>${s}</text>`;
+  const gE=p.Lg/2;
+  let s="";
+  // substrate
+  s+=`<rect x="${xL}" y="0" width="${Wtot}" height="${botH}" style="fill:var(--m-si)"/>`;
+  // ILD
+  s+=`<rect x="${xL}" y="${yT+14*u}" width="${Wtot}" height="${-(yT+14*u)}" style="fill:var(--m-ild);stroke:var(--m-edge);stroke-width:.6;stroke-dasharray:4 3" ${st}/>`;
+  const stiD=Math.min(botH-8*u,Math.max(p.Xj+40,120,hv?p.Xjddd+60:0));
+  [-1,1].forEach(sg=>{
+    const x0=sg<0?xL:half;
+    s+=r(x0,0,sti,stiD,"--m-ox");
+    // HV: deep n⁻ (DDD) under the n⁺, overhanging toward the gate by O_ddd
+    if(hv&&p.Xjddd>0){ const a=gE+Math.max(Lo-Math.min(p.Oddd,Lo),0), b=half, rr=Math.min(p.Xjddd*0.5,(b-a)/2);
+      const X=v=>sg*v; s+=`<path d="M${X(a)} 0 V${p.Xjddd-rr} Q${X(a)} ${p.Xjddd} ${X(a+rr)} ${p.Xjddd} H${X(b)} V0 Z" style="fill:var(--m-ddd);stroke:var(--m-edge);stroke-width:.6" ${st}/>`; }
+    // extension (HV: the drift LDD from under the gate to the n⁺)
+    const exA=gE-p.Lov, exB=hv?Math.min(gE+Lo+Math.max(p.Xjext,30),half):gE+p.Wsp+Math.min(20,p.Lsd-p.Wsp);
+    const ex0=sg<0?-exB:exA;
+    s+=`<rect x="${ex0}" y="0" width="${exB-exA}" height="${p.Xjext}" rx="${Math.min(p.Xjext*0.6,8)}" style="fill:var(--m-next);stroke:var(--m-edge);stroke-width:.6" ${st}/>`;
+    // deep S/D (HV: n⁺ starts at the drift length, not at the spacer)
+    const dA=gE+(hv?Math.min(Lo,p.Lsd-10):Math.min(p.Wsp,p.Lsd-10)), dB=half;
+    const d0=sg<0?-dB:dA;
+    const rr=Math.min(p.Xj*0.6,(dB-dA)/2);
+    if(sg>0) s+=`<path d="M${dA} 0 V${p.Xj-rr} Q${dA} ${p.Xj} ${dA+rr} ${p.Xj} H${dB} V0 Z" style="fill:var(--m-np);stroke:var(--m-edge);stroke-width:.6" ${st}/>`;
+    else s+=`<path d="M${-dA} 0 V${p.Xj-rr} Q${-dA} ${p.Xj} ${-dA-rr} ${p.Xj} H${-dB} V0 Z" style="fill:var(--m-np);stroke:var(--m-edge);stroke-width:.6" ${st}/>`;
+    // spacer
+    const spH=p.Hg+tox, rad=Math.min(p.Wsp,spH)*0.9;
+    if(sg>0) s+=`<path d="M${gE} 0 V${-spH} Q${gE+rad} ${-spH} ${gE+p.Wsp} ${-spH+rad} V0 Z" style="fill:var(--m-sp);stroke:var(--m-edge);stroke-width:.6" ${st}/>`;
+    else s+=`<path d="M${-gE} 0 V${-spH} Q${-gE-rad} ${-spH} ${-gE-p.Wsp} ${-spH+rad} V0 Z" style="fill:var(--m-sp);stroke:var(--m-edge);stroke-width:.6" ${st}/>`;
+    // plugs
+    const pA=gE+p.dpg, p0=sg<0?-(pA+p.CD):pA;
+    s+=r(p0,-p.Hp,p.CD,p.Hp,"--m-w");
+  });
+  // gate stack
+  s+=r(-gE,-tIL,p.Lg,tIL,"--m-ox");
+  if(tHK>0) s+=r(-gE,-tox,p.Lg,tHK,"--m-hk");
+  s+=r(-gE,-tox-p.Hg,p.Lg,p.Hg,p.gate==="poly"?"--m-poly":"--m-metal");
+
+  // labels
+  s+=txt(xL+sti/2,Math.min(stiD/2+fs/3,stiD-2*u),"STI","middle","--ink2");
+  s+=txt(xR-sti/2,Math.min(stiD/2+fs/3,stiD-2*u),"STI","middle","--ink2");
+  const sdX=hv?gE+Lo+(p.Lsd-Lo)/2:gE+p.Wsp+(p.Lsd-p.Wsp)/2;
+  s+=txt(-sdX,Math.max(p.Xj/2,fs)+fs/3,`n⁺ source · ${fmtIn(p.Nsd,{log:1})}`,"middle","--ink");
+  s+=txt(sdX,Math.max(p.Xj/2,fs)+fs/3,`n⁺ drain · ${fmtIn(p.Nsd,{log:1})}`,"middle","--ink");
+  s+=txt(0,botH-10*u,`p-well · channel Nₐ ${fmtIn(p.Na,{log:1})} cm⁻³`,"middle","--ink2");
+  s+=txt(0,-tox-p.Hg/2+fs/3,p.gate==="poly"?"n⁺ poly":"metal","middle","--ink");
+
+  // dimension helpers
+  const dimH=(x1,x2,y,label,above=true)=>{
+    const tk=5*u;
+    return `<g style="stroke:var(--ink2);stroke-width:1" ${st}><line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" ${st}/><line x1="${x1}" y1="${y-tk}" x2="${x1}" y2="${y+tk}" ${st}/><line x1="${x2}" y1="${y-tk}" x2="${x2}" y2="${y+tk}" ${st}/></g>`+
+      txt((x1+x2)/2,above?y-4*u:y+fs+2*u,label,"middle","--ink");
+  };
+  const dimV=(x,y1,y2,label,side=1)=>{
+    const tk=5*u;
+    return `<g style="stroke:var(--ink2);stroke-width:1" ${st}><line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" ${st}/><line x1="${x-tk}" y1="${y1}" x2="${x+tk}" y2="${y1}" ${st}/><line x1="${x-tk}" y1="${y2}" x2="${x+tk}" y2="${y2}" ${st}/></g>`+
+      txt(x+side*6*u,(y1+y2)/2+fs/3,label,side>0?"start":"end","--ink");
+  };
+  const gTop=-tox-p.Hg;
+  s+=dimH(-gE,gE,gTop-8*u,`Lg ${fmtIn(p.Lg,{})}`);
+  // plug gap on drain side, placed low within facing height
+  const yGap=-Math.min(p.Hg,p.Hp)*0.25;
+  s+=dimH(gE,gE+p.dpg,yGap,`${fmtIn(p.dpg,{})}`,true);
+  s+=dimH(gE+p.dpg,gE+p.dpg+p.CD,-p.Hp-6*u,`CD ${fmtIn(p.CD,{})}`);
+  s+=dimV(-(gE+p.dpg+p.CD)-10*u,-p.Hp,0,`${fmtIn(p.Hp,{})}`,-1);
+  s+=dimV(gE+p.dpg+p.CD+10*u,gTop,-tox,`Hg ${fmtIn(p.Hg,{})}`,1);
+  s+=dimV(half-8*u,0,p.Xj,`Xj ${fmtIn(p.Xj,{})}`,-1);
+  if(hv){ s+=dimH(gE,gE+Lo,Math.max(p.Xjext,p.Xj)+fs*0.2+(p.Xjddd>0?Math.min(p.Xjddd-Math.max(p.Xjext,p.Xj),40*u)/2:12*u),`drift ${fmtIn(Lo,{})}`,false);
+    s+=txt(gE+Lo/2,Math.max(p.Xjext/2,fs)+fs/3,`LDD ${fmtIn(p.Next,{log:1})}`,"middle","--ink");
+    if(p.Xjddd>Math.max(p.Xj,p.Xjext)+2*fs) s+=txt(sdX,(Math.max(p.Xj,p.Xjext)+p.Xjddd)/2+fs/3,`DDD ${fmtIn(p.Nddd,{log:1})}`,"middle","--ink2"); }
+  svg.innerHTML=s;
+  $("xs-note").textContent=`drawn to scale in nm · gate dielectric ${(p.tIL+p.tHK)<4*u?"exaggerated for visibility":"to scale"} · plug-to-gate spacing is edge to edge`;
+  const legend=[["--m-poly","n⁺ poly gate",P.gate==="poly"],["--m-metal","metal gate",P.gate==="metal"],["--m-ox","SiO₂ / STI",1],["--m-hk","high-k",P.tHK>0],["--m-sp","spacer",1],["--m-ild","ILD",1],["--m-w","plug",1],["--m-np",`deep n⁺ S/D · ${fmtIn(P.Nsd,{log:1})} cm⁻³`,1],["--m-next",`${P.dev==="hv"?"drift LDD":"extension (LDD)"} · ${fmtIn(P.Next,{log:1})} cm⁻³`,1],["--m-ddd",`DDD (deep n⁻) · ${fmtIn(P.Nddd,{log:1})} cm⁻³`,P.dev==="hv"],["--m-si","p-well",1]];
+  $("xs-legend").innerHTML=legend.filter(l=>l[2]).map(l=>`<span><i style="background:var(${l[0]})"></i>${l[1]}</span>`).join("");
+}
+
+/* ================= charts ================= */
+function niceTicks(a,b,n=5){
+  const span=b-a; if(!isFinite(span)||span<=0||span<1e-12*Math.max(Math.abs(a),Math.abs(b))) return isFinite(a)?[a]:[];
+  const s0=span/n, mag=Math.pow(10,Math.floor(Math.log10(s0))), r=s0/mag;
+  const step=(r<1.5?1:r<3?2:r<7?5:10)*mag, t=[];
+  for(let v=Math.ceil(a/step-1e-9)*step, k=0; v<=b+step*1e-9&&k<50; v+=step, k++) t.push(+v.toPrecision(12));
+  return t;
+}
+const supStr=n=>String(n).split("").map(c=>sup[c]).join("");
+function chart(host,cfg){
+  const Wd=Math.max(host.clientWidth,280), H=cfg.h||260, m={l:62,r:16,t:10,b:40};
+  const xs=cfg.x, pw=Wd-m.l-m.r, ph=H-m.t-m.b;
+  let xmin=Math.min(...xs), xmax=Math.max(...xs);
+  const all=[]; cfg.series.forEach(s=>s.y.forEach(v=>{if(isFinite(v)&&(!cfg.ylog||v>0)) all.push(v);}));
+  let ymin, ymax;
+  if(cfg.ylog){
+    ymax=Math.pow(10,Math.ceil(Math.log10(Math.max(...all))));
+    ymin=Math.pow(10,Math.floor(Math.log10(Math.min(...all))));
+    ymin=Math.max(ymin,ymax/1e14); if(ymin>=ymax) ymin=ymax/10;
+  } else {
+    let lo=Math.min(...all), hi=Math.max(...all);
+    if(cfg.zero){lo=Math.min(0,lo);}
+    if(hi===lo){hi=lo+Math.abs(lo||1)*0.1; lo=lo-Math.abs(lo||1)*0.1;}
+    const pad=(hi-lo)*0.06; if(!cfg.zero||lo<0) lo-=pad; hi+=pad;
+    const tk=niceTicks(lo,hi,5); ymin=Math.min(lo,tk[0]); ymax=Math.max(hi,tk[tk.length-1]);
+  }
+  const lx=cfg.xlog;
+  const sx=v=>m.l+(lx?(Math.log10(v)-Math.log10(xmin))/(Math.log10(xmax)-Math.log10(xmin)):(v-xmin)/(xmax-xmin))*pw;
+  const sy=v=>{const t=cfg.ylog?(Math.log10(Math.max(v,ymin))-Math.log10(ymin))/(Math.log10(ymax)-Math.log10(ymin)):(v-ymin)/(ymax-ymin);return m.t+(1-t)*ph;};
+  let g="";
+  // y grid
+  let yt=[];
+  if(cfg.ylog){const d0=Math.round(Math.log10(ymin)), d1=Math.round(Math.log10(ymax)), stp=Math.max(1,Math.ceil((d1-d0)/7));for(let d=d0;d<=d1;d+=stp) yt.push(Math.pow(10,d));}
+  else yt=niceTicks(ymin,ymax,5).filter(v=>v>=ymin-1e-12&&v<=ymax+1e-12);
+  yt.forEach(v=>{const y=sy(v);g+=`<line x1="${m.l}" x2="${m.l+pw}" y1="${y}" y2="${y}" style="stroke:var(--grid)"/>`;
+    const lab=cfg.ylog?`10${supStr(Math.round(Math.log10(v)))}`:(cfg.yfmt?cfg.yfmt(v):fmt(v,3));
+    g+=`<text x="${m.l-8}" y="${y+4}" text-anchor="end" style="fill:var(--muted);font:11px var(--mono)">${lab}</text>`;});
+  // x ticks
+  let xt=[];
+  if(lx){const d0=Math.ceil(Math.log10(xmin)-1e-9), d1=Math.floor(Math.log10(xmax)+1e-9);for(let d=d0;d<=d1;d++){[1,2,5].forEach(k=>{const v=k*Math.pow(10,d);if(v>=xmin*0.999&&v<=xmax*1.001)xt.push(v);});}
+    if(xt.length>8) xt=xt.filter(v=>Math.abs(Math.log10(v)%1)<1e-6);}
+  else xt=niceTicks(xmin,xmax,6).filter(v=>v>=xmin-1e-9&&v<=xmax+1e-9);
+  xt.forEach(v=>{const x=sx(v);g+=`<line x1="${x}" x2="${x}" y1="${m.t+ph}" y2="${m.t+ph+4}" style="stroke:var(--axis)"/>`;
+    g+=`<text x="${x}" y="${m.t+ph+17}" text-anchor="middle" style="fill:var(--muted);font:11px var(--mono)">${cfg.xfmt?cfg.xfmt(v):fmt(v,3)}</text>`;});
+  g+=`<line x1="${m.l}" x2="${m.l+pw}" y1="${m.t+ph}" y2="${m.t+ph}" style="stroke:var(--axis)"/>`;
+  g+=`<text x="${m.l+pw/2}" y="${H-4}" text-anchor="middle" style="fill:var(--ink2);font:12px var(--sans)">${cfg.xlab}</text>`;
+  g+=`<text transform="translate(13 ${m.t+ph/2}) rotate(-90)" text-anchor="middle" style="fill:var(--ink2);font:12px var(--sans)">${cfg.ylab}</text>`;
+  if(cfg.mark!=null&&cfg.mark>=xmin&&cfg.mark<=xmax){const x=sx(cfg.mark);g+=`<line x1="${x}" x2="${x}" y1="${m.t}" y2="${m.t+ph}" style="stroke:var(--ink2);stroke-dasharray:4 4"/>`;}
+  cfg.series.forEach(s=>{
+    let d="",pen=false;
+    xs.forEach((x,i)=>{const v=s.y[i];if(!isFinite(v)||(cfg.ylog&&v<=0)){pen=false;return;}d+=(pen?"L":"M")+sx(x).toFixed(2)+" "+sy(v).toFixed(2);pen=true;});
+    g+=`<path d="${d}" style="fill:none;stroke:var(${s.c});stroke-width:2;stroke-linejoin:round;stroke-linecap:round"/>`;
+  });
+  if(cfg.markY!=null&&cfg.mark!=null){g+=`<circle cx="${sx(cfg.mark)}" cy="${sy(cfg.markY)}" r="4.5" style="fill:var(${cfg.series[0].c});stroke:var(--panel);stroke-width:2"/>`;}
+  g+=`<g class="hov" style="display:none"><line class="hl" y1="${m.t}" y2="${m.t+ph}" style="stroke:var(--axis)"/>${cfg.series.map(s=>`<circle r="4" style="fill:var(${s.c});stroke:var(--panel);stroke-width:2"/>`).join("")}</g>`;
+  g+=`<rect class="hit" x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" style="fill:transparent"/>`;
+  const leg=cfg.series.length>1?`<div class="clegend">${cfg.series.map(s=>`<span><i style="background:var(${s.c})"></i>${s.name}</span>`).join("")}</div>`:"";
+  host.innerHTML=`${leg}<svg viewBox="0 0 ${Wd} ${H}" height="${H}" role="img" aria-label="${esc(cfg.aria||cfg.ylab)}">${g}</svg><div class="tip" hidden></div>`;
+  const svgEl=host.querySelector("svg"), hov=svgEl.querySelector(".hov"), hl=svgEl.querySelector(".hl"), dots=hov.querySelectorAll("circle"), tip=host.querySelector(".tip");
+  const move=ev=>{
+    const rect=svgEl.getBoundingClientRect(), px=(ev.clientX-rect.left)*(Wd/rect.width);
+    let bi=0,bd=1e9; xs.forEach((x,i)=>{const d=Math.abs(sx(x)-px);if(d<bd){bd=d;bi=i;}});
+    const X=sx(xs[bi]); hov.style.display=""; hl.setAttribute("x1",X); hl.setAttribute("x2",X);
+    cfg.series.forEach((s,i)=>{const v=s.y[bi];const ok=isFinite(v)&&(!cfg.ylog||v>0);dots[i].style.display=ok?"":"none";if(ok){dots[i].setAttribute("cx",X);dots[i].setAttribute("cy",sy(v));}});
+    tip.hidden=false;
+    tip.innerHTML=`<div class="t">${cfg.xname} = ${cfg.xfmt?cfg.xfmt(xs[bi]):fmt(xs[bi],3)}</div>`+cfg.series.map(s=>`<div><i style="background:var(${s.c})"></i>${cfg.series.length>1?s.name+": ":""}${fmt(s.y[bi],3)} ${cfg.yunit||""}</div>`).join("");
+    const hx=X*rect.width/Wd+svgEl.offsetLeft, tw=tip.offsetWidth;
+    let left=hx+12; if(left+tw>host.clientWidth) left=hx-tw-12;
+    tip.style.left=Math.max(0,left)+"px";
+    tip.style.top=(svgEl.offsetTop+m.t+6)+"px";
+  };
+  const leave=()=>{hov.style.display="none";tip.hidden=true;};
+  const hit=svgEl.querySelector(".hit");
+  hit.addEventListener("pointermove",move); hit.addEventListener("pointerdown",move); hit.addEventListener("pointerleave",leave);
+}
+
+function renderIV(M){
+  const V=M.p.VDD, Wum=M.W/1000, N=81;
+  const vg=[...Array(N)].map((_,i)=>-0.1*V+1.1*V*i/(N-1));
+  chart($("c-idvg"),{x:vg,ylog:1,xlab:"V<tspan dy='3' font-size='9'>GS</tspan><tspan dy='-3'> (V)</tspan>",ylab:"Drain current (µA/µm)",xname:"VGS",yunit:"µA/µm",aria:"Drain current versus gate voltage",
+    series:[{name:"VDS = 0.05 V",c:"--s1",y:vg.map(v=>M.idsM(v,0.05)*1e6/Wum)},{name:`VDS = ${fmt(V,3)} V`,c:"--s2",y:vg.map(v=>M.idsM(v,V)*1e6/Wum)}],
+    xfmt:v=>fmt(v,2)});
+  const vd=[...Array(49)].map((_,i)=>V*i/48);
+  const fr=[0.4,0.55,0.7,0.85,1.0], cs=["--q1","--q2","--q3","--q4","--q5"];
+  chart($("c-idvd"),{x:vd,zero:1,xlab:"V<tspan dy='3' font-size='9'>DS</tspan><tspan dy='-3'> (V)</tspan>",ylab:"Drain current (µA/µm)",xname:"VDS",yunit:"µA/µm",aria:"Drain current versus drain voltage",
+    series:fr.map((f,i)=>({name:`VGS ${fmt(f*V,3)} V`,c:cs[i],y:vd.map(v=>M.idsM(f*V,v)*1e6/Wum)})),xfmt:v=>fmt(v,2)});
+}
+
+/* ================= sweep ================= */
+const METRICS=[
+  {k:"tau",l:"Intrinsic delay CggVDD/Ion",u:"ps",f:M=>M.tau*1e12},
+  {k:"tpHL",l:"Drain discharge tpHL",u:"ps",f:M=>M.tpHL*1e12},
+  {k:"Ion",l:"Ion",u:"µA/µm",f:M=>M.Ion*1e6/(M.W/1000)},
+  {k:"Ioff",l:"Ioff",u:"nA/µm",f:M=>M.Ioff*1e9/(M.W/1000),log:1},
+  {k:"Vth",l:"Vth,sat",u:"V",f:M=>M.VthSat},
+  {k:"DIBL",l:"DIBL",u:"mV/V",f:M=>M.DIBL},
+  {k:"Cgg",l:"Cgg (on)",u:"fF",f:M=>M.CggOn*1e15},
+  {k:"Cgd",l:"Cgd extrinsic",u:"fF",f:M=>M.Cgd*1e15},
+  {k:"Cpg",l:"Plug–gate C per side",u:"fF",f:M=>M.Cpg*1e15},
+  {k:"Cdrain",l:"Drain node C",u:"fF",f:M=>M.Cdrain*1e15},
+  {k:"Rs",l:"RS per side",u:"Ω",f:M=>M.Rs},
+  {k:"fT",l:"fT",u:"GHz",f:M=>M.fT/1e9},
+  {k:"fmax",l:"fmax",u:"GHz",f:M=>M.fmax/1e9},
+  {k:"area",l:"Footprint area",u:"µm²",f:M=>M.areaUm2},
+  {k:"IonA",l:"I_on per area",u:"µA/µm²",f:M=>M.Ion*1e6/M.areaUm2},
+  {k:"BVdss",l:"Breakdown BV_dss",u:"V",f:M=>M.BVdss},
+  {k:"snapOn",l:"Snapback trigger (on state)",u:"V",f:M=>M.snapOn},
+  {k:"IsubR",l:"I_sub/I_D (hot carriers)",u:"",f:M=>M.IsubRatio,log:1},
+  {k:"VA",l:"Early voltage V_A",u:"V",f:M=>M.VA},
+  {k:"sigVth",l:"σV_th (Pelgrom)",u:"mV",f:M=>M.sigmaVth*1000},
+  {k:"RonA",l:"Specific R_on·A",u:"mΩ·mm²",f:M=>M.RonA,hv:1},
+  {k:"RonW",l:"R_on·W",u:"Ω·µm",f:M=>M.Ron*M.W/1000},
+  {k:"Vpass",l:"Pass voltage at V_G = V_DD",u:"V",f:M=>M.Vpass,hv:1},
+  {k:"VthFld",l:"Field-transistor V_th",u:"V",f:M=>M.VthFld,hv:1},
+  {k:"Rdrift",l:"Drift R per side (low current)",u:"Ω",f:M=>M.Rdrift,hv:1}
+];
+const swP=$("sw-p"), swM=$("sw-m");
+function buildSweepOpts(){
+  const pv=swP.value, mv=swM.value;
+  swP.innerHTML=PARAMS.filter(d=>!d.int).map(d=>`<option value="${d.k}">${d.l}${d.u?` (${d.u})`:""}</option>`).join("");
+  swM.innerHTML=METRICS.filter(m=>!m.hv||P.dev==="hv").map(m=>`<option value="${m.k}">${m.l} (${m.u})</option>`).join("");
+  swP.value=PARAMS.some(d=>d.k===pv)?pv:(P.dev==="hv"?"Ldr":"Lg");
+  swM.value=[...swM.options].some(o=>o.value===mv)?mv:(P.dev==="hv"?"RonA":"tau");
+}
+buildSweepOpts();
+try{const s=JSON.parse(localStorage.getItem("nmos-bench-sweep")||"null");if(s){if(PARAMS.some(d=>d.k===s.p))swP.value=s.p;if(METRICS.some(m=>m.k===s.m))swM.value=s.m;}}catch(e){}
+[swP,swM].forEach(el=>el.addEventListener("change",()=>{try{localStorage.setItem("nmos-bench-sweep",JSON.stringify({p:swP.value,m:swM.value}));}catch(e){}renderSweep();}));
+
+function renderSweep(){
+  const d=PARAMS.find(x=>x.k===swP.value), mt=METRICS.find(x=>x.k===swM.value), N=41;
+  let lo=d.min, hi=d.max;
+  if(d.k==="Lg"){lo=Math.max(d.min,2*P.Lov+12);hi=Math.min(d.max,Math.max(P.Lg*6,200));}
+  if(d.k==="W"){lo=Math.max(d.min,P.W/10);hi=Math.min(d.max,P.W*10);}
+  if(d.k==="dpg"){lo=Math.max(d.min,5);hi=Math.min(d.max,Math.max(P.Lsd-P.CD,P.dpg*2));}
+  const xs=[...Array(N)].map((_,i)=>d.log?Math.pow(10,Math.log10(lo)+(Math.log10(hi)-Math.log10(lo))*i/(N-1)):lo+(hi-lo)*i/(N-1));
+  const ys=xs.map(v=>{try{return mt.f(model({...P,[d.k]:v}));}catch(e){return NaN;}});
+  const cur=mt.f(model(P));
+  chart($("c-sweep"),{x:xs,xlog:d.log,ylog:mt.log,zero:["tau","tpHL","Ion","Cgg","Cgd","Cpg","Cdrain","Rs","fT","fmax"].includes(mt.k),
+    xlab:`${esc(d.l)}${d.u?` (${d.u})`:""}`,ylab:`${esc(mt.l)} (${mt.u})`,xname:d.l,yunit:mt.u,
+    series:[{name:mt.l,c:"--s1",y:ys}],mark:P[d.k],markY:cur,h:280,
+    xfmt:v=>{if(d.log&&v>=1e4){const e=Math.log10(v);return Math.abs(e-Math.round(e))<1e-6?`10${supStr(Math.round(e))}`:fmtIn(v,d);}return fmt(v,3);},
+    aria:`${mt.l} versus ${d.l}`});
+}
+
+/* ================= design optimizer ================= */
+const OPT=window.NMOS_OPT, REFS=window.NMOS_REF;
+const OM=OPT.METRICS;
+let OV=OPT.VALID;
+const OPT_DEF={lv:{on:{Na:1,tIL:1,Next:1,Xjext:1},o1:"IoffTot",d1:"min",o2:"tau",d2:"min",pop:60,gen:60,
+    cons:[{m:"VthSat",op:">=",v:0.25},{m:"Eox",op:"<=",v:6},{m:"Igc",op:"<=",v:10},{m:"DIBL",op:"<=",v:100},{m:"actMargin",op:">=",v:0}]},
+  hv:{on:{Ldr:1,Next:1,Nddd:1,tIL:1},o1:"RonA",d1:"min",o2:"BVdss",d2:"max",pop:32,gen:25,
+    cons:[{m:"VthSat",op:">=",v:0.4},{m:"Eox",op:"<=",v:5},{m:"actMargin",op:">=",v:0},{m:"fldMargin",op:">=",v:0},{m:"rtMargin",op:">=",v:0}]}};
+const optState={on:{...OPT_DEF.lv.on},bounds:{},run:null,stop:false,sel:null,front:[],feas:[],cfg:null};
+function defBounds(d){
+  if(OV[d.k]) return [Math.max(d.min,OV[d.k][0]),Math.min(d.max,OV[d.k][1])];
+  return [d.min,d.max];
+}
+PARAMS.forEach(d=>optState.bounds[d.k]=defBounds(d));
+function buildOptVars(){
+  let h="";
+  GROUPS.forEach(g=>{
+    const ds=PARAMS.filter(d=>d.g===g.id);
+    h+=`<div class="g">${g.name}</div>`;
+    ds.forEach(d=>{
+      const on=!!optState.on[d.k], [lo,hi]=optState.bounds[d.k];
+      h+=`<div class="ov" id="ov-${d.k}"><input type="checkbox" class="sw" role="switch" id="ot-${d.k}" ${on?"checked":""} aria-label="Optimize ${esc(d.l)}">
+        <label class="n" for="ot-${d.k}">${d.l}${d.u?`<span class="u">${d.u}</span>`:""}</label>
+        <div class="b" ${on?"":"hidden"}><input type="text" id="olo-${d.k}" value="${fmtIn(lo,d)}" aria-label="${esc(d.l)} lower bound"> to <input type="text" id="ohi-${d.k}" value="${fmtIn(hi,d)}" aria-label="${esc(d.l)} upper bound"><span class="flag" id="ofl-${d.k}" hidden>outside checked range</span></div></div>`;
+    });
+  });
+  $("opt-vars").innerHTML=h;
+  PARAMS.forEach(d=>{
+    $("ot-"+d.k).addEventListener("change",e=>{optState.on[d.k]=e.target.checked?1:0; if(!e.target.checked) delete optState.on[d.k];
+      $("ov-"+d.k).querySelector(".b").hidden=!e.target.checked; updOptFlags();});
+    ["olo","ohi"].forEach((pre,j)=>$(pre+"-"+d.k).addEventListener("change",e=>{
+      const v=parseFloat(e.target.value); if(!isFinite(v)){e.target.value=fmtIn(optState.bounds[d.k][j],d);return;}
+      const c=Math.min(d.max,Math.max(d.min,v)); optState.bounds[d.k][j]=c; e.target.value=fmtIn(c,d);
+      if(optState.bounds[d.k][0]>optState.bounds[d.k][1]) optState.bounds[d.k].reverse(), $("olo-"+d.k).value=fmtIn(optState.bounds[d.k][0],d), $("ohi-"+d.k).value=fmtIn(optState.bounds[d.k][1],d);
+      updOptFlags();}));
+  });
+  updOptFlags();
+}
+function updOptFlags(){
+  const n=Object.keys(optState.on).length;
+  $("opt-count").textContent=n?`${n} selected`:"none selected";
+  PARAMS.forEach(d=>{const f=$("ofl-"+d.k); if(!f) return; const [lo,hi]=optState.bounds[d.k];
+    f.hidden=!(OV[d.k]&&(lo<OV[d.k][0]*0.999||hi>OV[d.k][1]*1.001));});
+}
+const metricOpts=(sel,withNone)=>(withNone?`<option value="">(single goal)</option>`:"")+Object.entries(OM).map(([k,m])=>`<option value="${k}" ${k===sel?"selected":""}>${esc(m.l)} (${m.u})</option>`).join("");
+$("opt-o1").innerHTML=metricOpts("IoffTot"); $("opt-o2").innerHTML=metricOpts("tau",true);
+const optCons=OPT_DEF.lv.cons.map(c=>({...c}));
+function buildCons(){
+  $("opt-cons").innerHTML=optCons.map((c,i)=>`<div class="crow"><select id="oc-m-${i}" aria-label="Limit ${i+1} quantity">${metricOpts(c.m)}</select>
+    <select id="oc-o-${i}" aria-label="Limit ${i+1} type"><option value="<=" ${c.op==="<="?"selected":""}>≤</option><option value=">=" ${c.op===">="?"selected":""}>≥</option></select>
+    <input type="text" id="oc-v-${i}" value="${c.v}" aria-label="Limit ${i+1} value"><button type="button" id="oc-x-${i}" aria-label="Remove limit ${i+1}">×</button></div>`).join("")||`<p class="hint">No limits. Every design counts as feasible.</p>`;
+  optCons.forEach((c,i)=>{
+    $("oc-m-"+i).addEventListener("change",e=>c.m=e.target.value);
+    $("oc-o-"+i).addEventListener("change",e=>c.op=e.target.value);
+    $("oc-v-"+i).addEventListener("change",e=>{const v=parseFloat(e.target.value); if(isFinite(v)) c.v=v; else e.target.value=c.v;});
+    $("oc-x-"+i).addEventListener("click",()=>{optCons.splice(i,1);buildCons();});
+  });
+}
+$("opt-addc").addEventListener("click",()=>{optCons.push({m:"IoffTot",op:"<=",v:1});buildCons();});
+buildOptVars(); buildCons();
+// load the optimizer defaults of a device type (knobs, ranges, goals, limits, effort)
+function optDefaults(dev){
+  const D=OPT_DEF[dev]; OV=dev==="hv"?OPT.VALID_HV:OPT.VALID;
+  optState.on={...D.on}; optState.bounds={}; PARAMS.forEach(d=>optState.bounds[d.k]=defBounds(d));
+  $("opt-o1").innerHTML=metricOpts(D.o1); $("opt-o2").innerHTML=metricOpts(D.o2,true); $("opt-d1").value=D.d1; $("opt-d2").value=D.d2;
+  optCons.splice(0,optCons.length,...D.cons.map(c=>({...c})));
+  if(dev==="hv") optCons.push({m:"bvMargin",op:">=",v:+(0.2*P.VDD).toFixed(2)});
+  $("opt-pop").value=D.pop; $("opt-gen").value=D.gen;
+  Object.assign(optState,{run:null,sel:null,front:[],feas:[]}); $("opt-plot").innerHTML=""; $("opt-legend").innerHTML=""; $("opt-sel").innerHTML=""; optStatus("");
+  $("opt-hint").textContent=dev==="hv"?"HV breakdown is computed for every design (tens of ms each), so a run takes about a minute. Click a point on the front to inspect it.":"Run the optimizer, then click a point on the front to inspect it.";
+  buildOptVars(); buildCons();
+}
+
+function optStatus(t){$("opt-status").textContent=t;}
+$("opt-run").addEventListener("click",()=>{
+  let vars=Object.keys(optState.on).map(k=>({k,lo:optState.bounds[k][0],hi:optState.bounds[k][1]}));
+  let note="";
+  if(P.lsdAuto&&optState.on.Lsd){vars=vars.filter(v=>v.k!=="Lsd");note=" (active length is set by the contact rule, so that knob was skipped)";}
+  if(!vars.length){optStatus("Switch on at least one knob."+note);return;}
+  const o1=$("opt-o1").value,o2=$("opt-o2").value;
+  const objectives=[{m:o1,dir:$("opt-d1").value}]; if(o2) objectives.push({m:o2,dir:$("opt-d2").value});
+  const pop=Math.max(8,Math.min(400,Math.round(+$("opt-pop").value)||60)), gens=Math.max(1,Math.min(1000,Math.round(+$("opt-gen").value)||60));
+  const dLg=Math.max(0,parseFloat($("opt-dl").value)||0);
+  const cfg={vars,objectives,constraints:optCons.map(c=>({...c})),dLg,base:{...P}};
+  // drop limits that none of the selected knobs can move and that are already violated: they would make
+  // every design "infeasible" by the same amount and hide the real trade-off
+  const probe=OPT.nmosProblem(window.NMOS,cfg).probeLimits();
+  const dropped=probe.filter(l=>l.fixed&&!l.reachable);
+  if(dropped.length){
+    cfg.constraints=cfg.constraints.filter((c,i)=>!dropped.some(d=>d.i===i));
+    note+=` · ignored ${dropped.map(d=>`${OM[d.m].l} ${d.op==="<="?"≤":"≥"} ${d.v} (fixed at ${fmt(d.value,3)} ${OM[d.m].u}: no selected knob changes it)`).join("; ")}`;
+  }
+  const prob=OPT.nmosProblem(window.NMOS,cfg);
+  const seedX={}; vars.forEach(v=>seedX[v.k]=Math.min(v.hi,Math.max(v.lo,P[v.k])));
+  const run=OPT.createRun(prob,{pop,seed:1}).init([seedX]);
+  Object.assign(optState,{run,stop:false,cfg,prob,sel:null,base:{...P},gens,note});
+  $("opt-run").disabled=true; $("opt-stop").disabled=false; $("opt-sel").innerHTML="";
+  const t0=performance.now();
+  const loop=()=>{
+    if(optState.stop||run.gen>=gens){finishOpt(t0);return;}
+    const tt=performance.now(); while(run.gen<gens&&performance.now()-tt<60) run.step(1);
+    optStatus(`Generation ${run.gen}/${gens} · ${run.evals} designs evaluated`);
+    if(run.gen%5===0||run.gen>=gens) drawOpt();
+    setTimeout(loop,0);
+  };
+  optStatus("Starting…"); setTimeout(loop,0);
+});
+$("opt-stop").addEventListener("click",()=>{optState.stop=true;});
+function finishOpt(t0){
+  $("opt-run").disabled=false; $("opt-stop").disabled=true; drawOpt();
+  const r=optState.run, nf=r.archive.filter(p=>p.viol===0).length;
+  optStatus(`Done in ${((performance.now()-t0)/1000).toFixed(1)} s · ${r.evals} designs · ${nf} meet the limits · ${optState.front.length} on the front${optState.note||""}`);
+  if(!nf){
+    // name the limits that even the least-violating design misses, so the user knows which knob or limit to change
+    const best=[...r.archive].sort((a,b)=>a.viol-b.viol)[0], M=model({...optState.base,...best.x});
+    const miss=optState.cfg.constraints.filter(c=>{const v=OM[c.m].f(M);return c.op==="<="?v>c.v:v<c.v;})
+      .map(c=>`${OM[c.m].l} ${c.op==="<="?"≤":"≥"} ${c.v} ${OM[c.m].u} (best reached ${fmt(OM[c.m].f(M),3)})`);
+    $("opt-hint").textContent=`No design met every limit. Missed even by the best design: ${miss.join("; ")}. Switch on a knob that moves it, widen a range, or loosen the limit.`;
+  }
+}
+function drawOpt(){
+  const r=optState.run; if(!r) return;
+  const cfg=optState.cfg, host=$("opt-plot");
+  const feas=r.archive.filter(p=>p.viol===0);
+  const front=r.pareto();
+  const single=cfg.objectives.length===1;
+  optState.front=front; optState.feas=feas;
+  const mx=cfg.objectives[0].m, my=single?null:cfg.objectives[1].m;
+  const cur=OPT.nmosProblem(window.NMOS,{...cfg,vars:[]}).evaluate({}).data.metrics;
+  if(single){
+    // convergence view: best objective per generation index of the archive
+    host.innerHTML=""; $("opt-legend").innerHTML="";
+    const best=front[0]; $("opt-hint").textContent=best?`Best design: ${OM[mx].l} = ${fmt(best.data.metrics[mx],3)} ${OM[mx].u}.`:"";
+    if(best) selectOpt(best);
+    return;
+  }
+  const W=Math.max(host.clientWidth,300), H=340, m={l:62,r:16,t:10,b:42}, pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const pts=feas.length?feas:front;
+  // zoom on the front (plus the current design); far-off designs would otherwise squash it into a corner
+  const fin=(v,m)=>isFinite(v)&&(!OM[m].log||v>0);
+  const xs=front.map(p=>p.data.metrics[mx]).concat([cur[mx]]).filter(v=>fin(v,mx));
+  const ys=front.map(p=>p.data.metrics[my]).concat([cur[my]]).filter(v=>fin(v,my));
+  const ax=(vals,log)=>{if(!vals.length) vals=[log?1:0];let lo=Math.min(...vals),hi=Math.max(...vals);
+    if(log){lo=Math.pow(10,Math.floor(Math.log10(lo)));hi=Math.pow(10,Math.ceil(Math.log10(hi)));if(hi/lo>1e16)lo=hi/1e16;return {lo,hi,log};}
+    const pad=(hi-lo||Math.abs(hi)*0.2||1)*0.15; return {lo:lo-pad,hi:hi+pad,log};};
+  const X=ax(xs,OM[mx].log), Y=ax(ys,OM[my].log);
+  const sx=v=>m.l+(X.log?(Math.log10(v)-Math.log10(X.lo))/(Math.log10(X.hi)-Math.log10(X.lo)):(v-X.lo)/(X.hi-X.lo))*pw;
+  const sy=v=>m.t+(1-(Y.log?(Math.log10(v)-Math.log10(Y.lo))/(Math.log10(Y.hi)-Math.log10(Y.lo)):(v-Y.lo)/(Y.hi-Y.lo)))*ph;
+  const ticks=A=>{if(A.log){const t=[];const d0=Math.round(Math.log10(A.lo)),d1=Math.round(Math.log10(A.hi)),st=Math.max(1,Math.ceil((d1-d0)/6));for(let d=d0;d<=d1;d+=st)t.push(Math.pow(10,d));return t;} return niceTicks(A.lo,A.hi,5).filter(v=>v>=A.lo&&v<=A.hi);};
+  const lab=(v,A)=>A.log?`10${supStr(Math.round(Math.log10(v)))}`:fmt(v,3);
+  let g="";
+  ticks(Y).forEach(v=>{const y=sy(v);g+=`<line x1="${m.l}" x2="${m.l+pw}" y1="${y}" y2="${y}" style="stroke:var(--grid)"/><text x="${m.l-8}" y="${y+4}" text-anchor="end" style="fill:var(--muted);font:11px var(--mono)">${lab(v,Y)}</text>`;});
+  ticks(X).forEach(v=>{const x=sx(v);g+=`<line x1="${x}" x2="${x}" y1="${m.t}" y2="${m.t+ph}" style="stroke:var(--grid)"/><text x="${x}" y="${m.t+ph+17}" text-anchor="middle" style="fill:var(--muted);font:11px var(--mono)">${lab(v,X)}</text>`;});
+  g+=`<line x1="${m.l}" x2="${m.l+pw}" y1="${m.t+ph}" y2="${m.t+ph}" style="stroke:var(--axis)"/>`;
+  g+=`<text x="${m.l+pw/2}" y="${H-4}" text-anchor="middle" style="fill:var(--ink2);font:12px var(--sans)">${esc(OM[mx].l)} (${OM[mx].u})</text>`;
+  g+=`<text transform="translate(13 ${m.t+ph/2}) rotate(-90)" text-anchor="middle" style="fill:var(--ink2);font:12px var(--sans)">${esc(OM[my].l)} (${OM[my].u})</text>`;
+  const ok=p=>{const a=p.data&&p.data.metrics; return a&&isFinite(a[mx])&&isFinite(a[my])&&(!X.log||a[mx]>0)&&(!Y.log||a[my]>0);};
+  const sample=pts.length>1500?pts.filter((_,i)=>i%Math.ceil(pts.length/1500)===0):pts;
+  const inView=p=>{const a=p.data.metrics[mx],b=p.data.metrics[my];return a>=X.lo&&a<=X.hi&&b>=Y.lo&&b<=Y.hi;};
+  sample.filter(ok).filter(inView).forEach(p=>{g+=`<circle cx="${sx(p.data.metrics[mx]).toFixed(1)}" cy="${sy(p.data.metrics[my]).toFixed(1)}" r="2.2" style="fill:var(--muted);opacity:.35"/>`;});
+  const F=front.filter(ok);
+  if(F.length>1){const sorted=[...F].sort((a,b)=>a.data.metrics[mx]-b.data.metrics[mx]);g+=`<path d="${sorted.map((p,i)=>(i?"L":"M")+sx(p.data.metrics[mx]).toFixed(1)+" "+sy(p.data.metrics[my]).toFixed(1)).join("")}" style="fill:none;stroke:var(--s1);stroke-width:2;opacity:.7"/>`;}
+  // the front can hold hundreds of points; show ~40 evenly spaced, clickable representatives
+  const Fs=[...F].sort((a,b)=>a.data.metrics[mx]-b.data.metrics[mx]), nRep=Math.min(40,Fs.length);
+  const reps=[...new Set(Array.from({length:nRep},(_,i)=>Fs[Math.round(i*(Fs.length-1)/Math.max(1,nRep-1))]))];
+  reps.forEach(p=>{g+=`<circle class="fp" data-i="${front.indexOf(p)}" cx="${sx(p.data.metrics[mx]).toFixed(1)}" cy="${sy(p.data.metrics[my]).toFixed(1)}" r="5" style="fill:var(--s1);stroke:var(--panel);stroke-width:1.5;cursor:pointer"/>`;});
+  if(isFinite(cur[mx])&&isFinite(cur[my])) g+=`<circle cx="${sx(cur[mx])}" cy="${sy(cur[my])}" r="6" style="fill:none;stroke:var(--ink);stroke-width:2"/>`;
+  if(optState.sel&&ok(optState.sel)) g+=`<circle cx="${sx(optState.sel.data.metrics[mx])}" cy="${sy(optState.sel.data.metrics[my])}" r="7.5" style="fill:var(--s2);stroke:var(--panel);stroke-width:2"/>`;
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Pareto front">${g}</svg><div class="tip" hidden></div>`;
+  $("opt-legend").innerHTML=`<span><i style="background:var(--s1)"></i>${feas.length?"Pareto front":"Least-violating trade-off (no design meets every limit)"} (${F.length} designs, ${reps.length} shown as points)</span>${feas.length?`<span><i style="background:var(--muted);opacity:.5"></i>other designs meeting the limits</span>`:""}<span><i style="border:2px solid var(--ink);width:7px;height:7px"></i>current design</span>${optState.sel?`<span><i style="background:var(--s2)"></i>selected</span>`:""}`;
+  const svgEl=host.querySelector("svg"), tip=host.querySelector(".tip");
+  svgEl.querySelectorAll(".fp").forEach(c=>{
+    const p=front[+c.dataset.i];
+    c.addEventListener("pointerenter",()=>{tip.hidden=false;tip.innerHTML=`<div class="t">click to inspect</div>`+optState.cfg.vars.map(v=>{const d=PARAMS.find(x=>x.k===v.k);return `<div>${esc(d.l)}: ${fmtIn(p.x[v.k],d)} ${d.u}</div>`;}).join("")+`<div>${esc(OM[mx].l)}: ${fmt(p.data.metrics[mx],3)} ${OM[mx].u}</div><div>${esc(OM[my].l)}: ${fmt(p.data.metrics[my],3)} ${OM[my].u}</div>`;
+      const cx=+c.getAttribute("cx")*svgEl.getBoundingClientRect().width/W; let left=cx+14; if(left+tip.offsetWidth>host.clientWidth) left=cx-tip.offsetWidth-14; tip.style.left=Math.max(0,left)+"px"; tip.style.top=Math.max(0,+c.getAttribute("cy")*svgEl.getBoundingClientRect().height/H-20)+"px";});
+    c.addEventListener("pointerleave",()=>{tip.hidden=true;});
+    c.addEventListener("click",()=>{selectOpt(p);drawOpt();});
+  });
+  if(front.length&&feas.length){
+    const areaGoal=cfg.objectives.some(o=>o.m==="area"&&o.dir==="min"), driveLimit=cfg.constraints.some(c=>(c.m==="IonTot"||c.m==="IonA")&&c.op===">=");
+    $("opt-hint").textContent=(areaGoal&&!driveLimit&&cfg.vars.some(v=>v.k==="W")?"Area is minimised with no drive limit, so W simply shrinks to its lower bound. Add a limit such as “I_on, whole device ≥ …” to size the device for a load. ":"")
+      +"Click a point on the front to inspect it, apply it to the simulator, or re-check it with the 2D solvers. The view is zoomed on the front.";
+  }
+}
+function selectOpt(p){
+  optState.sel=p;
+  const full={...optState.base,...p.x}, M=model(full), cur=model(optState.base);
+  const out=OPT.nmosProblem(window.NMOS,{...optState.cfg,vars:[]}).outsideValid(p.x);
+  const keys=["tau","tpHL","Ion","IonTot","IoffTot","Igc","VthSat","DIBL","SS","Eox","area","IonA"];
+  const mv=(Mx,k)=>OM[k].f(Mx);
+  $("opt-sel").innerHTML=`<div class="sel"><h4>Selected design${p.viol>0?" (does not meet every limit)":""}</h4>
+    <div class="two"><div><table><tr><th>Knob</th><th>Current</th><th>Selected</th></tr>${optState.cfg.vars.map(v=>{const d=PARAMS.find(x=>x.k===v.k);return `<tr><td>${esc(d.l)} <span style="color:var(--muted)">${d.u}</span></td><td>${fmtIn(optState.base[v.k],d)}</td><td><b>${fmtIn(p.x[v.k],d)}</b></td></tr>`;}).join("")}</table></div>
+    <div><table><tr><th>Result</th><th>Current</th><th>Selected</th></tr>${keys.map(k=>`<tr><td>${esc(OM[k].l)} <span style="color:var(--muted)">${OM[k].u}</span></td><td>${fmt(mv(cur,k),3)}</td><td><b>${fmt(mv(M,k),3)}</b></td></tr>`).join("")}</table></div></div>
+    ${out.length?`<p class="hint" style="color:var(--warn-ink)">Outside the range where the calibrated model parts were checked: ${out.join(", ")}. Re-check with the 2D solvers before trusting it.</p>`:""}
+    ${optState.cfg.dLg?`<p class="hint">Goals and limits were judged at the worst of L<sub>g</sub> and L<sub>g</sub> ± ${optState.cfg.dLg} nm; the table shows the nominal device.</p>`:""}
+    <div class="btnrow"><button class="btn primary" type="button" id="opt-apply">Apply to simulator</button><button class="btn" type="button" id="opt-verify">Re-check with 2D solvers (~10 s)</button><span class="ostat" id="opt-vstat"></span></div>
+    <div id="opt-ver"></div></div>`;
+  $("opt-apply").addEventListener("click",()=>{Object.assign(P,p.x);syncAll();schedule();$("opt-vstat").textContent="Applied. The panels above now show this design.";});
+  $("opt-verify").addEventListener("click",async()=>{
+    const b=$("opt-verify"); b.disabled=true;
+    try{
+      const rows=await REFS.verifyDesign(window.NMOS,full,msg=>{$("opt-vstat").textContent=msg+"…";});
+      const nOk=rows.filter(r=>r.ok).length;
+      $("opt-vstat").textContent=`${nOk}/${rows.length} checks agree with the 2D solvers`;
+      $("opt-ver").innerHTML=`<table style="margin-top:8px"><tr><th>Check</th><th>Compact</th><th>2D solver</th><th>Tolerance</th><th></th></tr>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${fmt(r.compact,3)} ${r.unit}</td><td>${fmt(r.ref,3)} ${r.unit}</td><td>${r.tol}</td><td class="${r.ok?"vpass":"vfail"}">${r.ok?"agrees":"differs"}</td></tr>`).join("")}</table>`;
+    }catch(e){$("opt-vstat").textContent="Check failed: "+e.message;}
+    b.disabled=false;
+  });
+}
+
+/* ================= main loop ================= */
+let pending=false, lastM=null;
+function renderAll(){
+  pending=false;
+  const M=model(P); lastM=M;
+  renderKPIs(M); renderWarns(M); renderBreakdown(M); renderHF(M); renderXS(M); renderIV(M); renderSweep();
+}
+function schedule(){if(!pending){pending=true;requestAnimationFrame(renderAll);}}
+function setDev(dev){
+  P={...PRESETS[dev]}; PARAMS=paramsFor(dev);
+  buildInputs(); buildSweepOpts(); optDefaults(dev); syncAll();
+  document.querySelectorAll("#devsel [data-dev]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.dev===dev)));
+  $("subtitle").textContent=dev==="hv"?"30 V-class HV NMOS: DDD drain with an offset n⁺ (drift), thick gate oxide, breakdown, R_on·A, body effect and pass-gate transfer.":
+    "Compact-model estimate of gate/junction/plug capacitance, S/D series resistance, I–V and switching delay for one planar NMOS.";
+  try{localStorage.setItem("nmos-bench-dev",dev);}catch(e){}
+  schedule();
+}
+document.querySelectorAll("#devsel [data-dev]").forEach(b=>b.addEventListener("click",()=>{ if(b.dataset.dev!==P.dev) setDev(b.dataset.dev); }));
+$("reset").addEventListener("click",()=>{P={...PRESETS[P.dev]};PARAMS.forEach(d=>{const t=$("in-"+d.k);t.classList.remove("bad");});syncAll();schedule();});
+let dev0="lv"; try{ if(localStorage.getItem("nmos-bench-dev")==="hv") dev0="hv"; }catch(e){}
+setDev(dev0); renderAll();
+let rt; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(lastM){renderIV(lastM);renderSweep();drawOpt();}},120);});
 })();
 </script>
-</body>
-</html>
+
+<script src="guide.js"></script>
+<script src="../kit/shell.js"></script>
+</body></html>

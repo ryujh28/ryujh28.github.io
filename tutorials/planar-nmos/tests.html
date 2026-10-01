@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Planar NMOS Bench · Verification tests</title><style>body{margin:0}</style></head><body>
-<a href="./" style="position:fixed;left:12px;bottom:12px;z-index:50;font:600 13px/1 system-ui,sans-serif;padding:9px 13px;border-radius:999px;background:#0f172a;color:#fff;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.2)">← Tutorial</a>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verification tests · Planar NMOS bench</title><style>body{margin:0}</style><link rel="stylesheet" href="../kit/shell.css">
+</head><body>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,7 +78,7 @@ table#matrix{border-collapse:collapse;font-size:12px;min-width:100%}
       <p>Runs the same test suite as <code>node tests/run_tests.js</code> against the compact model used by Planar NMOS Bench: material references, independent Poisson/Laplace solvers, analytic limits, scaling, trends, continuity and random-input robustness.</p>
     </div>
     <div class="bar">
-      <label class="chk"><input type="checkbox" id="fast" checked> Quick run (uncheck for the full ~1 min run)</label>
+      <label class="chk"><input type="checkbox" id="fast" checked> Quick run (uncheck for the full run, about 6 min)</label>
       <label class="chk"><input type="checkbox" id="onlyfail"> Show failures only</label>
       <button class="primary" id="run" type="button">Run tests</button>
     </div>
@@ -126,7 +126,7 @@ function render(){
   }).join("");
 }
 function run(){
-  $("run").disabled=true; $("summary").innerHTML=`<span class="status">Running${$("fast").checked?" quick":""} suite… (the full run takes several seconds)</span>`;
+  $("run").disabled=true; $("summary").innerHTML=`<span class="status">Running${$("fast").checked?" quick":""} suite… (the page is busy until it finishes)</span>`;
   setTimeout(()=>{
     const t0=performance.now();
     last=NMOS_TESTS.runAll(NMOS,NMOS_REF,{fast:$("fast").checked,TRENDS:NMOS_TRENDS,OPT:NMOS_OPT,HVREF:self.NMOS_HVREF});
@@ -138,8 +138,11 @@ function run(){
 }
 $("run").addEventListener("click",run);
 $("onlyfail").addEventListener("change",render);
-run();
+// not started automatically: the quick suite keeps the page busy for about a minute
+$("summary").innerHTML=`<span class="status">Press <b>Run tests</b> to start. The quick suite takes about a minute and the page is busy while it runs; the full suite (with the 2D solvers) takes about six minutes.</span>`;
 })();
 </script>
 
+<script>window.TUTORIAL={id:"planar-nmos-tests",title:"Planar NMOS bench · Verification tests",back:["./","Back to the simulation"]};</script>
+<script src="../kit/shell.js"></script>
 </body></html>
