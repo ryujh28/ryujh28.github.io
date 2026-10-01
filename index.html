@@ -314,6 +314,7 @@
         <li><a href="#career">Career</a></li>
         <li><a href="#research">Research Interests</a></li>
         <li><a href="#publications">Publications</a></li>
+        <li><a href="tutorials/">Tutorials</a></li>
       </ul>
     </div>
   </header>
@@ -655,7 +656,7 @@
     });
 
     // ===== Navbar active link on scroll =====
-    const navLinks = Array.from(document.querySelectorAll("#navLinks a"));
+    const navLinks = Array.from(document.querySelectorAll("#navLinks a[href^='#']")); // in-page links only (Tutorials is a separate page)
     const sections = navLinks
       .map(a => document.querySelector(a.getAttribute("href")))
       .filter(Boolean);

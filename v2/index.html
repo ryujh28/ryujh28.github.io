@@ -200,6 +200,7 @@ footer .links{margin-top:0}
       <li><a href="#publications">Publications</a></li>
       <li><a href="#journey">Journey</a></li>
       <li><a href="#talks">Talks</a></li>
+      <li><a href="../tutorials/">Tutorials</a></li>
     </ul>
   </div>
 </nav>
@@ -426,7 +427,7 @@ footer .links{margin-top:0}
 
   // nav background + active link
   var nav = document.getElementById("nav");
-  var links = [].slice.call(document.querySelectorAll(".navlinks a"));
+  var links = [].slice.call(document.querySelectorAll(".navlinks a[href^='#']")); // in-page links only
   var secs = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
   function onScroll(){
     nav.classList.toggle("scrolled", window.scrollY > 24);

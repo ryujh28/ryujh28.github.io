@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planar NMOS bench · Tutorials · Jae Hyun Ryu</title>
+<meta name="description" content="How a browser-based compact model of a planar NMOS computes R, C, delay, leakage and breakdown, and how it was checked against 1D and 2D Poisson solvers.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_style.css">
+</head>
+<body>
+<header class="navbar">
+  <div class="nav-inner">
+    <a class="brand" href="../../">Jae Hyun Ryu</a>
+    <ul class="nav-links">
+      <li><a href="../../">Home</a></li>
+      <li><a href="../" class="active">Tutorials</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="page">
+  <div class="crumbs"><a href="../">Tutorials</a> / Planar NMOS bench</div>
+  <h1>A planar NMOS, from gate stack to delay, in the browser</h1>
+  <p class="lead">This bench turns the layout and process numbers of a single planar NMOS (gate stack, gate length, doping, contact plugs) into resistance, capacitance, drive current, delay, leakage and breakdown. Everything runs as plain JavaScript in your browser; no server, no install.</p>
+  <div class="btns">
+    <a class="btn primary" href="simulator.html">Open the simulator →</a>
+    <a class="btn" href="tests.html">Run the verification tests</a>
+  </div>
+
+  <div class="note"><b>What it is and isn't.</b> This is a teaching and trend-exploration tool built on textbook physics and example parameter values. It is not calibrated to any real process, and absolute numbers should not be used for design sign-off. The point is to see <i>which</i> knob moves <i>which</i> output, and why.</div>
+
+  <div class="layout">
+    <nav class="toc" aria-label="Contents">
+      <b>Contents</b>
+      <ol>
+        <li><a href="#what">1. What it computes</a></li>
+        <li><a href="#start">2. Quick start</a></li>
+        <li><a href="#vth">3. Gate stack and V<sub>th</sub></a></li>
+        <li><a href="#sce">4. Short-channel effects</a></li>
+        <li><a href="#current">5. Drain current</a></li>
+        <li><a href="#rc">6. Resistance and capacitance</a></li>
+        <li><a href="#speed">7. Speed metrics</a></li>
+        <li><a href="#leak">8. Leakage</a></li>
+        <li><a href="#bv">9. Breakdown and hot carriers</a></li>
+        <li><a href="#hv">10. The 30 V-class HV device</a></li>
+        <li><a href="#opt">11. Design optimizer</a></li>
+        <li><a href="#verify">12. How it was checked</a></li>
+        <li><a href="#limits">13. Known limitations</a></li>
+      </ol>
+    </nav>
+
+    <article>
+      <section id="what">
+        <h2>1. What it computes</h2>
+        <p>The model is a <b>compact model</b>: closed-form equations, the same kind of thing circuit simulators use, rather than a field solver like TCAD. That makes one evaluation take well under a millisecond, which is what lets you drag a slider and see every output update, or let an optimizer try thousands of designs.</p>
+        <div class="tablewrap"><table>
+          <tr><th>Inputs</th><th>Outputs</th></tr>
+          <tr><td>Gate stack: interfacial oxide and high-k thickness and k, poly or metal gate, gate height, fixed charge, interface traps</td><td>V<sub>th</sub> (linear and saturation), DIBL, subthreshold swing</td></tr>
+          <tr><td>Geometry: L<sub>g</sub>, W, gate–extension overlap, spacer width and k, active length</td><td>I<sub>on</sub>, I<sub>eff</sub>, I<sub>off</sub> broken into components, R<sub>on</sub></td></tr>
+          <tr><td>Doping: channel, well, extension (LDD), deep S/D, junction depths</td><td>Series resistance per side, gate resistance</td></tr>
+          <tr><td>Contacts: plug CD, plug-to-gate spacing, plug height and count, barrier height, ILD k</td><td>C<sub>gg</sub>, C<sub>gd</sub>, junction and drain-node capacitance</td></tr>
+          <tr><td>Operating point: V<sub>DD</sub>, temperature, body bias</td><td>CV/I, drain discharge time, f<sub>T</sub>, f<sub>max</sub>, oxide field</td></tr>
+          <tr><td>Layout: spacing to neighbouring devices</td><td>Breakdown voltage and its limiting mechanism, footprint area, V<sub>th</sub> mismatch</td></tr>
+        </table></div>
+        <p>The default device is a 90 nm-class logic transistor (2 nm SiO<sub>2</sub>, V<sub>DD</sub> = 1.2 V). A switch at the top of the simulator changes to a 30 V-class high-voltage device (section 10).</p>
+      </section>
+
+      <section id="start">
+        <h2>2. Quick start</h2>
+        <ol class="steps">
+          <li>Open the <a href="simulator.html">simulator</a>. Inputs are on the left, results on the right, and a to-scale cross-section shows the device you are describing.</li>
+          <li>Drag <b>Gate length L<sub>g</sub></b> down from 90 nm. Watch V<sub>th</sub> fall and I<sub>off</sub> rise (short-channel effects) while CV/I improves.</li>
+          <li>Raise <b>Gate height</b>. C<sub>gg</sub> grows through the sidewall fringe, so CV/I gets slower, while R<sub>g</sub> falls, so the gate RC improves. Two effects, opposite directions.</li>
+          <li>In <b>Parameter sweep</b>, pick any input and any output to see the full curve, with a dashed line at the current value.</li>
+          <li>In <b>Design optimizer</b>, switch on a few knobs, pick two goals (say I<sub>off</sub> and CV/I), add limits, and run. Click a point on the Pareto front to inspect it, apply it, or re-check it with the 2D solvers.</li>
+        </ol>
+        <div class="tip">The delay outputs are in seconds, so a <i>larger</i> number is a <i>slower</i> device.</div>
+      </section>
+
+      <section id="vth">
+        <h2>3. Gate stack and threshold voltage</h2>
+        <p>A multi-layer gate dielectric is reduced to an equivalent SiO<sub>2</sub> thickness, and the inversion capacitance adds the depth of the inversion charge and, for a poly gate, the depleted layer of the gate itself:</p>
+        <div class="eq">EOT = t<sub>IL</sub>·3.9/k<sub>IL</sub> + t<sub>HK</sub>·3.9/k<sub>HK</sub> &nbsp;&nbsp; T<sub>inv</sub> = EOT + 0.4 nm + t<sub>poly-dep</sub>·3.9/11.7</div>
+        <p>The long-channel threshold is the textbook expression, with the body bias widening the depletion region:</p>
+        <div class="eq">V<sub>th</sub> = V<sub>FB</sub> + 2φ<sub>F</sub> + √(2qε<sub>Si</sub>N<sub>A</sub>(2φ<sub>F</sub> + V<sub>SB</sub>)) / C<sub>ox</sub>, &nbsp; V<sub>FB</sub> = φ<sub>ms</sub> − qQ<sub>f</sub>/C<sub>ox</sub></div>
+        <p>This is checked against an exact 1D solution of Poisson's equation (the integrated surface charge Q<sub>s</sub>(ψ<sub>s</sub>)), and agrees to better than 0.01 mV, with and without body bias.</p>
+      </section>
+
+      <section id="sce">
+        <h2>4. Short-channel effects</h2>
+        <p>When the channel gets short, the source and drain take over part of the depletion charge under the gate, so V<sub>th</sub> falls (roll-off), and the drain voltage lowers the source barrier (DIBL). The model uses the BSIM3 form:</p>
+        <div class="eq">ΔV<sub>th</sub> = −DVT0·θ(L)·(V<sub>bi</sub> − 2φ<sub>F</sub>) − ETA0·θ<sub>DIBL</sub>(L)·V<sub>DS</sub>, &nbsp; θ(L) = e<sup>−D·L/2λ</sup> + 2e<sup>−D·L/λ</sup></div>
+        <p>with a characteristic length λ that grows with oxide thickness, depletion depth and the extension junction depth. The five constants were <b>fitted to a 2D nonlinear Poisson solver</b> written for this project, on a gate-length sweep, then checked on five held-out devices with different doping, oxide, junction depth and overlap. An earlier textbook version (fixed coefficients) under-predicted roll-off by 4–5× against the same 2D solution, which is why the fit was needed.</p>
+        <p>The subthreshold swing uses the Taur–Ning short-channel factor, so it also degrades at short L. Interface traps add qD<sub>it</sub> to the depletion capacitance in the swing.</p>
+      </section>
+
+      <section id="current">
+        <h2>5. Drain current</h2>
+        <p>One smooth expression covers subthreshold to strong inversion (BSIM's effective gate overdrive V<sub>gsteff</sub>), with a universal mobility curve and velocity saturation:</p>
+        <div class="eq">I = (W/L)·µ<sub>eff</sub>·C<sub>inv</sub>·V<sub>gsteff</sub>·[1 − m·V<sub>dseff</sub>/2(V<sub>gsteff</sub>+2v<sub>t</sub>)]·V<sub>dseff</sub> / (1 + V<sub>dseff</sub>/E<sub>sat</sub>L)</div>
+        <p>Above saturation, a velocity-saturated region of length ΔL forms at the drain (channel-length modulation), and the current is multiplied by (1 + ΔL/L). Series resistance is applied self-consistently: the terminal current is the one for which the intrinsic transistor, seeing V<sub>GS</sub> − IR<sub>S</sub> and V<sub>DS</sub> − 2IR<sub>S</sub>, carries exactly that current.</p>
+        <div class="tip">Try the <b>CLM strength</b> input (0 to 2). At 1, the default device's I<sub>on</sub> is about 27% higher than with CLM off, and CV/I is correspondingly faster. That coefficient is the textbook value and has <i>not</i> been fitted (section 13), so the slider lets you see how much the result depends on it.</div>
+      </section>
+
+      <section id="rc">
+        <h2>6. Resistance and capacitance</h2>
+        <h3>Series resistance (per side)</h3>
+        <ul>
+          <li><b>Front end</b>: where the channel meets the extension, current crowds through the overlap. The gate-induced accumulation layer and the extension form two coupled resistive sheets (a two-layer transmission line), in parallel with the spreading resistance at the gate edge. The coupling coefficient was calibrated against a 2D resistor solver over 27 combinations.</li>
+          <li><b>Extension and deep S/D sheets</b> along the path to the plug, <b>contact resistance</b> from thermionic-field emission (ρ<sub>c</sub> = ρ<sub>c0</sub>·exp(φ<sub>B</sub>/E<sub>0</sub>)), and the <b>plug body</b>.</li>
+        </ul>
+        <p>A nice consequence: R<sub>S</sub> first falls as the overlap grows (less spreading), then rises again (the overlap itself has resistance). The 2D solver shows the same minimum.</p>
+        <h3>Capacitance</h3>
+        <ul>
+          <li><b>Channel and overlap</b> from C<sub>inv</sub> and C<sub>ox</sub>.</li>
+          <li><b>Outer fringe</b> from the gate sidewall through spacer then ILD (quarter-circle field lines), cut off by a grounded contact plug only over the width the plugs actually cover.</li>
+          <li><b>Plug-to-gate</b> plate plus edge fringes, with the spacer and ILD in series.</li>
+          <li><b>Junctions</b> as one-sided abrupt junctions, averaged over the 0 → V<sub>DD</sub> drain swing.</li>
+        </ul>
+        <p>Fringe and plug–gate capacitance agree with a 2D Laplace solver within about 16% over eleven geometries.</p>
+      </section>
+
+      <section id="speed">
+        <h2>7. Speed metrics</h2>
+        <div class="tablewrap"><table>
+          <tr><th>Metric</th><th>Definition</th><th>What it captures</th></tr>
+          <tr><td>CV/I</td><td>C<sub>gg</sub>·V<sub>DD</sub>/I<sub>on</sub></td><td>Intrinsic delay of the transistor driving its own gate charge</td></tr>
+          <tr><td>t<sub>pHL</sub></td><td>C<sub>drain</sub>·V<sub>DD</sub>/(2I<sub>eff</sub>)</td><td>Discharging the drain node (junction + gate–drain + load)</td></tr>
+          <tr><td>R<sub>g</sub>C<sub>gg</sub></td><td>gate sheet R·W/3L<sub>g</sub> × C<sub>gg</sub></td><td>Distributed gate RC</td></tr>
+          <tr><td>f<sub>T</sub>, f<sub>max</sub></td><td>g<sub>m</sub>/2πC<sub>gg</sub>; f<sub>T</sub>/2√(g<sub>ds</sub>(R<sub>g</sub>+R<sub>S</sub>) + 2πf<sub>T</sub>R<sub>g</sub>C<sub>gd</sub>)</td><td>Small-signal limits</td></tr>
+        </table></div>
+        <p>I<sub>eff</sub> is the average of the currents at (V<sub>DD</sub>, V<sub>DD</sub>/2) and (V<sub>DD</sub>/2, V<sub>DD</sub>), a better proxy for switching than I<sub>on</sub> alone.</p>
+      </section>
+
+      <section id="leak">
+        <h2>8. Leakage</h2>
+        <ul>
+          <li><b>Subthreshold</b> from the same current equation at V<sub>GS</sub> = 0.</li>
+          <li><b>Gate direct tunnelling</b>: Schuegraf–Hu for the SiO<sub>2</sub> layer with a WKB factor for a high-k layer. 1.5 nm SiO<sub>2</sub> at 1 V gives about 3.5 A/cm², in the range of published measurements, and the current drops about one decade per 0.2 nm.</li>
+          <li><b>Junction band-to-band tunnelling</b> and <b>GIDL</b> at the drain edge (order-of-magnitude).</li>
+          <li><b>SRH generation</b> in the drain depletion volume, q·n<sub>i</sub>·W<sub>dep</sub>·A/(2τ<sub>g</sub>), which dominates at high temperature and high voltage.</li>
+        </ul>
+        <p>The simulator shows which component dominates. For the default device it is subthreshold; below about 1.4 nm oxide, gate tunnelling takes over; above about 6×10<sup>18</sup> cm<sup>−3</sup> channel doping, junction tunnelling does.</p>
+      </section>
+
+      <section id="bv">
+        <h2>9. Breakdown and hot carriers</h2>
+        <p>Breakdown is computed for each mechanism separately, and the lowest one sets BV<sub>dss</sub> (gate, source and body grounded). The simulator draws all of them as bars, so you see not only the number but what limits it.</p>
+        <ul>
+          <li><b>Junction avalanche</b>: the ionisation integral ∫α dx = 1 with Van Overstraeten–de Man coefficients, over the field of a cylindrical junction edge (radius = junction depth). Within 1% of a full 1D Poisson field profile with the same coefficients.</li>
+          <li><b>Gated-diode avalanche</b>: the same integral with the gate-induced vertical field added at the drain edge.</li>
+          <li><b>Zener and GIDL</b>: the tunnelling current reaches a criterion current (1 µA/µm by default; it is an input, since every company uses its own spec).</li>
+          <li><b>Punch-through</b>: the V<sub>GS</sub> = 0 channel current reaches the criterion. Within about 10% of the 2D Poisson solver for short channels; one longer, more heavily doped case is 49% high and is among the known failures (section 12).</li>
+          <li><b>Hot carriers and snapback</b>: substrate current from Hu's model; snapback when I<sub>sub</sub>·R<sub>sub</sub> forward-biases the source junction by 0.7 V.</li>
+        </ul>
+        <p>Against a 2D Poisson solution with ionisation integrals taken along field lines, the compact avalanche voltage agrees within about 20% on the devices tested.</p>
+      </section>
+
+      <section id="hv">
+        <h2>10. The 30 V-class HV device</h2>
+        <p>High-voltage transistors (for example the ones that pass program and erase voltages in non-volatile memory) look different: a thick oxide (here 65 nm), a long channel, and a drain built to spread the field.</p>
+        <ul>
+          <li><b>Three-layer drain</b>: a shallow, lightly doped drift (LDD) from under the gate; an n<sup>+</sup> placed a drift length away from the gate edge; and a deep, lightly doped layer (DDD) wrapping the n<sup>+</sup> and reaching toward the gate.</li>
+          <li><b>Drift resistance</b>: parallel sheets, thinned by the drift–body depletion at the local bias (a JFET effect), with velocity saturation capped at the Kirk current q·N·v<sub>sat</sub>·t, plus space-charge-limited conduction beyond it. The low-current value agrees with a 2D resistor within 4% over twelve structures.</li>
+          <li><b>Breakdown</b> at three places: the gate edge and drift surface (a quasi-2D surface Poisson model including the gate field and the depletion from the body below, the RESURF effect), the LDD corner, and the bottom corner of the n<sup>+</sup>/DDD. Against 103 2D Poisson + ionisation runs, the error is 7–17% rms depending on the data set.</li>
+          <li><b>Pass voltage</b>: with the gate at V<sub>DD</sub>, the output can only rise until V<sub>G</sub> − V<sub>out</sub> = V<sub>th</sub>(V<sub>SB</sub> + V<sub>out</sub>); the body effect is what makes this matter.</li>
+          <li><b>Field transistor</b>: poly running over the isolation oxide can invert the surface between neighbouring n<sup>+</sup> regions; its threshold is shown and flagged if close to V<sub>DD</sub>.</li>
+          <li><b>R<sub>on</sub>·A</b> (on-resistance × footprint), the standard figure of merit traded against breakdown voltage.</li>
+        </ul>
+        <p>The example HV device gives BV<sub>dss</sub> ≈ 37 V (limited at the n<sup>+</sup>/DDD corner; a live 2D run gives 39 V), V<sub>th</sub> ≈ 0.92 V and R<sub>on</sub>·A ≈ 149 mΩ·mm². The values are illustrative, not from any real process.</p>
+      </section>
+
+      <section id="opt">
+        <h2>11. Design optimizer</h2>
+        <p>The optimizer is NSGA-II, a genetic algorithm that keeps a population of designs and evolves it toward the <b>Pareto front</b>: the set of designs where you cannot improve one goal without making the other worse.</p>
+        <ul>
+          <li>Toggle which inputs it may change; everything else stays at your current values.</li>
+          <li>Pick one or two goals and any number of limits (e.g. V<sub>th</sub> ≥ 0.25 V, oxide field ≤ 6 MV/cm, BV ≥ 1.2·V<sub>DD</sub>).</li>
+          <li>Optionally require robustness to gate-length variation: each candidate is judged at its worst ±ΔL corner.</li>
+          <li>Limits that none of the selected knobs can move are detected before the run and reported, instead of silently blocking it.</li>
+        </ul>
+        <p>Optimizers are good at finding where a model is weakest, so a chosen design can be re-checked against the 2D solvers with one click, and it is flagged if it sits outside the range where the fitted parts of the model were checked.</p>
+      </section>
+
+      <section id="verify">
+        <h2>12. How it was checked</h2>
+        <p>The guiding rule: <b>compare against something that does not reuse the model's own equations</b>, and write down the expected result and tolerance <i>before</i> running. Several independent reference solvers were written for this:</p>
+        <div class="tablewrap"><table>
+          <tr><th>Reference</th><th>Used for</th></tr>
+          <tr><td>Exact 1D MOS charge (integrated Poisson)</td><td>Threshold, body effect, inversion charge</td></tr>
+          <tr><td>1D nonlinear Poisson for a pn junction</td><td>Junction capacitance, avalanche field profile</td></tr>
+          <tr><td>2D Laplace (finite volume)</td><td>Gate fringe and plug-to-gate capacitance</td></tr>
+          <tr><td>2D resistor</td><td>Overlap/spreading resistance, HV drift resistance</td></tr>
+          <tr><td>2D nonlinear Poisson (LV and HV cross-sections)</td><td>Short-channel effects, punch-through, avalanche along field lines</td></tr>
+        </table></div>
+        <p>On top of that, a <b>trend matrix</b>: for every input, the expected direction of every output (up, down, or no change) was written from physics before running the model, then checked over a sweep. It has 56 rows and 386 graded cells. Writing the expectations first is what caught most of the real errors, such as a missing short-channel term in the swing, or a capacitance that rose when a grounded plug moved <i>away</i> from the gate.</p>
+        <p>The full suite has 302 tests: 293 pass, 5 report a number without a pass/fail criterion, and 4 fail. The failures are known model limitations, kept visible rather than tuned away. You can run the whole suite yourself on the <a href="tests.html">test page</a> (the quick run takes about a minute).</p>
+      </section>
+
+      <section id="limits">
+        <h2>13. Known limitations</h2>
+        <ul>
+          <li><b>Inversion charge is over-estimated by 25–45%</b> in strong inversion compared with the exact 1D solution, because threshold is defined at ψ<sub>s</sub> = 2φ<sub>F</sub>. I<sub>on</sub> is likely high by a similar amount.</li>
+          <li><b>The CLM coefficient is not fitted.</b> Poisson's equation fixes charge and potential, not how carriers move, so it cannot calibrate saturation current or output conductance; that would need a drift-diffusion solver or measured I–V curves.</li>
+          <li><b>No calibration to a real process.</b> Mobility, strain, halo profiles and quantum effects are textbook or absent. The fitted constants are fitted to this project's own 2D solvers, which use rectangular junctions and uniform doping.</li>
+          <li><b>HV device</b>: no short-channel current model (punch-through is reported as a conservative 1D bound instead), and no impact ionisation in the drift region, so on-state safe operating area is not covered.</li>
+          <li>Heavily doped (10<sup>20</sup>) silicon resistivity is 22% low against Masetti's data, and the avalanche coefficients give a breakdown 36% above Sze's empirical fit at 10<sup>17</sup> cm<sup>−3</sup>.</li>
+        </ul>
+        <p>Treat outputs as trend and sensitivity estimates. If you have measured or TCAD I–V curves, they are the right thing to calibrate against.</p>
+        <div class="btns">
+          <a class="btn primary" href="simulator.html">Open the simulator →</a>
+          <a class="btn" href="tests.html">Run the verification tests</a>
+        </div>
+      </section>
+    </article>
+  </div>
+</main>
+<footer>© Jae Hyun Ryu · Personal project for learning and exploration; not affiliated with or endorsed by any employer. Parameter values are illustrative.</footer>
+<script>
+// highlight the current section in the contents list
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  function on(){ var y=window.scrollY+window.innerHeight*0.3, cur=-1;
+    secs.forEach(function(s,i){ if(s&&s.offsetTop<=y) cur=i; });
+    links.forEach(function(a,i){ a.classList.toggle('active',i===cur); }); }
+  window.addEventListener('scroll',on,{passive:true}); on();
+})();
+</script>
+</body>
+</html>

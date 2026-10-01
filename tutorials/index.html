@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutorials · Jae Hyun Ryu</title>
+<meta name="description" content="Interactive tutorials by Jae Hyun Ryu: device physics and simulation you can run in the browser.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_style.css">
+</head>
+<body>
+<header class="navbar">
+  <div class="nav-inner">
+    <a class="brand" href="../">Jae Hyun Ryu</a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="./" class="active">Tutorials</a></li>
+    </ul>
+  </div>
+</header>
+<main class="page">
+  <h1>Tutorials</h1>
+  <p class="lead">Small, self-contained tools that run in the browser, each with a write-up of the physics behind it and how it was checked.</p>
+  <div class="grid">
+    <a class="card tcard" href="planar-nmos/">
+      <span class="kicker">Device physics · Interactive</span>
+      <h2>Planar NMOS bench</h2>
+      <p>A compact model of one planar NMOS: set the gate stack, geometry, doping and contacts, and get R, C, delay, leakage and breakdown. Includes a 30 V-class HV device, a design optimizer and a verification suite against 1D/2D Poisson solvers.</p>
+      <div class="tags"><span class="tag">MOSFET</span><span class="tag">Compact model</span><span class="tag">Poisson</span><span class="tag">NSGA-II</span></div>
+    </a>
+  </div>
+</main>
+<footer>© Jae Hyun Ryu · Personal project; not affiliated with any employer.</footer>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Planar NMOS Bench · Verification tests</title><style>body{margin:0}</style></head><body>
+<a href="./" style="position:fixed;left:12px;bottom:12px;z-index:50;font:600 13px/1 system-ui,sans-serif;padding:9px 13px;border-radius:999px;background:#0f172a;color:#fff;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.2)">← Tutorial</a>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1F2; --panel:#FBFCFC; --ink:#131A20; --ink2:#46525C; --muted:#76828C; --line:#D7DDE1; --grid:#E4E8EA;
+  --accent:#0A6A93; --accent-ink:#FFFFFF;
+  --pass:#0c7a0c; --pass-bg:#E3F3E3; --fail:#B42C2C; --fail-bg:#FBE6E6; --info:#1E6394; --info-bg:#E2EEF7;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace; --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){color-scheme:dark;
+    --bg:#0E1316; --panel:#161D21; --ink:#E7ECEF; --ink2:#AAB5BD; --muted:#7D8993; --line:#29333A; --grid:#222B31;
+    --accent:#4FB0D9; --accent-ink:#06151C;
+    --pass:#5CCB5C; --pass-bg:#15301A; --fail:#F08080; --fail-bg:#3A1A1C; --info:#7DBDEB; --info-bg:#132A3A;}
+}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#0E1316; --panel:#161D21; --ink:#E7ECEF; --ink2:#AAB5BD; --muted:#7D8993; --line:#29333A; --grid:#222B31;
+  --accent:#4FB0D9; --accent-ink:#06151C;
+  --pass:#5CCB5C; --pass-bg:#15301A; --fail:#F08080; --fail-bg:#3A1A1C; --info:#7DBDEB; --info-bg:#132A3A;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--sans)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:18px 40px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+h1{font:600 24px var(--cond);margin:0}
+header p{margin:2px 0 0;color:var(--ink2);font-size:13px;max-width:70ch}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:500 13px var(--sans);border-radius:6px;padding:7px 14px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+label.chk{font-size:13px;color:var(--ink2);display:flex;gap:6px;align-items:center}
+.summary{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.pill{display:flex;gap:8px;align-items:baseline;padding:8px 14px;border-radius:8px;background:var(--panel);border:1px solid var(--line)}
+.pill b{font:500 22px var(--mono)}
+.pill span{font-size:12px;color:var(--ink2)}
+.pill.pass b{color:var(--pass)} .pill.fail b{color:var(--fail)} .pill.info b{color:var(--info)}
+.status{font-size:13px;color:var(--ink2);align-self:center}
+section.grp{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:14px;overflow:hidden}
+section.grp h2{font:600 11.5px var(--cond);letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:0;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+section.grp h2 span{font:400 12px var(--mono);letter-spacing:0;text-transform:none}
+.t{display:grid;grid-template-columns:62px minmax(0,1fr);gap:4px 12px;padding:9px 14px;border-bottom:1px solid var(--grid)}
+.t:last-child{border-bottom:0}
+.badge{font:600 11px var(--mono);text-align:center;border-radius:4px;padding:2px 0;align-self:start;margin-top:1px}
+.badge.pass{color:var(--pass);background:var(--pass-bg)} .badge.fail{color:var(--fail);background:var(--fail-bg)} .badge.info{color:var(--info);background:var(--info-bg)}
+.name{font-weight:500}
+.kv{grid-column:2;display:grid;grid-template-columns:70px minmax(0,1fr);gap:1px 8px;font-size:12.5px}
+.kv .k{color:var(--muted)}
+.kv .v{font:12.5px var(--mono);overflow-wrap:anywhere}
+.kv .note{font:12.5px var(--sans);color:var(--ink2)}
+.mx-scroll{overflow-x:auto}
+table#matrix{border-collapse:collapse;font-size:12px;min-width:100%}
+#matrix th{font:500 11.5px var(--sans);color:var(--ink2);padding:6px 4px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--line)}
+#matrix th.row{text-align:left;padding-left:14px;font-weight:500;color:var(--ink);white-space:normal;min-width:180px}
+#matrix td{text-align:center;padding:3px;border-bottom:1px solid var(--grid)}
+#matrix td .c{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:42px;height:34px;border-radius:5px;font-family:var(--mono);line-height:1}
+#matrix td .c b{font-size:15px;font-weight:600}
+#matrix td .c small{font-size:10px;margin-top:2px;opacity:.85}
+#matrix td .c.ok{background:var(--pass-bg);color:var(--pass)}
+#matrix td .c.bad{background:var(--fail-bg);color:var(--fail);outline:1.5px solid var(--fail)}
+#matrix td .c.na{color:var(--muted)}
+#matrix tr:hover th.row{color:var(--accent)}
+.mx-key{display:flex;flex-wrap:wrap;gap:6px 16px;padding:10px 14px;font-size:12px;color:var(--ink2);border-top:1px solid var(--line)}
+.mx-key i.k{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}
+.mx-key i.ok{background:var(--pass-bg);border:1px solid var(--pass)} .mx-key i.bad{background:var(--fail-bg);border:1px solid var(--fail)} .mx-key i.na{border:1px dashed var(--muted)}
+@media (max-width:560px){.t{grid-template-columns:minmax(0,1fr)}.kv{grid-column:1}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>NMOS Model Verification</h1>
+      <p>Runs the same test suite as <code>node tests/run_tests.js</code> against the compact model used by Planar NMOS Bench: material references, independent Poisson/Laplace solvers, analytic limits, scaling, trends, continuity and random-input robustness.</p>
+    </div>
+    <div class="bar">
+      <label class="chk"><input type="checkbox" id="fast" checked> Quick run (uncheck for the full ~1 min run)</label>
+      <label class="chk"><input type="checkbox" id="onlyfail"> Show failures only</label>
+      <button class="primary" id="run" type="button">Run tests</button>
+    </div>
+  </header>
+  <div class="summary" id="summary"><span class="status" id="status">Loading…</span></div>
+  <section class="grp mx" id="matrix-wrap" hidden>
+    <h2>Trend matrix: raise each knob, which way should each output move?<span>big sign = expected from physics · small = model</span></h2>
+    <div class="mx-scroll"><table id="matrix"></table></div>
+    <div class="mx-key"><span><i class="k ok"></i>model follows the expected direction</span><span><i class="k bad"></i>model disagrees</span><span><i class="k na"></i>not graded (competing effects); model direction shown</span><span>+ rises · − falls · 0 unchanged · ± non-monotonic</span></div>
+  </section>
+  <div id="results"></div>
+</div>
+
+<script src="nmos_model.js"></script>
+<script src="optimizer.js"></script>
+<script src="tests/reference_solvers.js"></script>
+<script src="tests/nmos_model.test.js"></script>
+<script src="tests/trend_matrix.js"></script>
+<script src="tests/hv_reference_data.js"></script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let last=[];
+const rng=v=>v>=1e4?v.toExponential(1).replace("e+","e"):String(+v.toPrecision(3));
+function renderMatrix(TM){
+  const M=NMOS_TRENDS.METRICS;
+  $("matrix").innerHTML=`<thead><tr><th class="row">Knob ↑ (sweep window)</th>${M.map(m=>`<th>${esc(m.l)}</th>`).join("")}</tr></thead><tbody>`+
+    TM.map(k=>`<tr title="${esc(k.why)}"><th class="row">${esc(k.name)}<br><small style="color:var(--muted);font-weight:400">${rng(k.range[0])} … ${rng(k.range[1])}</small></th>`+
+      k.cells.map(c=>{const cls=c.ok===null?"na":(c.ok?"ok":"bad");
+        const tip=`${c.label}: expected ${c.expected}, model ${c.seen} (${(+c.from.toPrecision(3))} → ${(+c.to.toPrecision(3))})`;
+        return `<td><span class="c ${cls}" title="${esc(tip)}"><b>${c.ok===null?"·":esc(c.expected)}</b><small>${esc(c.seen)}</small></span></td>`;}).join("")+`</tr>`).join("")+`</tbody>`;
+  $("matrix-wrap").hidden=false;
+}
+function render(){
+  const only=$("onlyfail").checked;
+  const groups=[...new Set(last.map(r=>r.group))];
+  $("results").innerHTML=groups.map(g=>{
+    const rs=last.filter(r=>r.group===g), shown=rs.filter(r=>!only||r.status==="fail");
+    if(!shown.length) return "";
+    const np=rs.filter(r=>r.status==="pass").length, nf=rs.filter(r=>r.status==="fail").length;
+    return `<section class="grp"><h2>${esc(g)}<span>${np} pass · ${nf} fail</span></h2>`+shown.map(r=>`
+      <div class="t"><div class="badge ${r.status}">${r.status.toUpperCase()}</div><div class="name">${esc(r.name)}</div>
+      <div class="kv"><div class="k">expected</div><div class="v">${esc(r.expected)}</div><div class="k">got</div><div class="v">${esc(r.got)}</div>${r.note?`<div class="k">note</div><div class="note">${esc(r.note)}</div>`:""}</div></div>`).join("")+`</section>`;
+  }).join("");
+}
+function run(){
+  $("run").disabled=true; $("summary").innerHTML=`<span class="status">Running${$("fast").checked?" quick":""} suite… (the full run takes several seconds)</span>`;
+  setTimeout(()=>{
+    const t0=performance.now();
+    last=NMOS_TESTS.runAll(NMOS,NMOS_REF,{fast:$("fast").checked,TRENDS:NMOS_TRENDS,OPT:NMOS_OPT,HVREF:self.NMOS_HVREF});
+    renderMatrix(NMOS_TRENDS.run(NMOS));
+    const n=s=>last.filter(r=>r.status===s).length;
+    $("summary").innerHTML=`<div class="pill pass"><b>${n("pass")}</b><span>passed</span></div><div class="pill fail"><b>${n("fail")}</b><span>failed</span></div><div class="pill info"><b>${n("info")}</b><span>reported only</span></div><span class="status">${((performance.now()-t0)/1000).toFixed(1)} s</span>`;
+    render(); $("run").disabled=false;
+  },30);
+}
+$("run").addEventListener("click",run);
+$("onlyfail").addEventListener("change",render);
+run();
+})();
+</script>
+
+</body></html>
