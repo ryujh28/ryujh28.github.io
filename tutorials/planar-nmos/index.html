@@ -94,10 +94,49 @@ main{display:flex;flex-direction:column;gap:16px;min-width:0}
 .hero b{font:500 30px var(--mono);letter-spacing:-.01em}
 .hero span{color:var(--muted);font-size:12px}
 .warns{display:flex;flex-direction:column;gap:6px}
+/* at-a-glance: summary bar, compact metrics, input accordion, analysis tabs */
+.glance-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.glance-bar .sp{flex:1}
+details.wbox{flex:1 1 420px;min-width:0}
+details.wbox>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--warn-bg);color:var(--warn-ink);border-radius:6px;padding:7px 10px;font-size:12.5px}
+details.wbox>summary::-webkit-details-marker{display:none}
+details.wbox>summary .n{font-weight:600;white-space:nowrap}
+details.wbox>summary .first{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+details.wbox>summary .chev{transition:transform .15s}
+details.wbox[open]>summary .chev{transform:rotate(90deg)}
+details.wbox .warns{margin-top:6px}
+.wok{flex:1 1 420px;font-size:12.5px;color:var(--muted);padding:7px 2px}
+.kpis:not(.all) .kv .more{display:none}
+.kpis .kv .key-last{border-bottom:0}
+.kpis.all .kv .key-last{border-bottom:1px dashed var(--grid)}
+.grp-h{cursor:pointer;user-select:none}
+.grp-h h2::before{content:"";display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--ink2);margin:0 7px 2px 0;transition:transform .15s}
+.grp.shut .grp-h h2::before{transform:rotate(-90deg)}
+.grp.shut{padding-bottom:12px}
+.grp.shut .grp-h{margin-bottom:0}
+.grp.shut>:not(.grp-h){display:none}
+.tabs{background:var(--panel);border:1px solid var(--line);border-radius:8px;min-width:0}
+.tablist{display:flex;gap:2px;padding:6px 8px 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:thin}
+.tablist button{font:500 13px var(--sans);color:var(--ink2);background:none;border:0;border-bottom:2px solid transparent;padding:8px 12px 9px;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
+.tablist button:hover{color:var(--ink)}
+.tablist button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tablist button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:4px}
+.tabpanes{padding:14px 16px 16px}
+.tabpanes>[role=tabpanel]>.panel,.tabpanes>[role=tabpanel] .two>.panel{border:0;padding:0;background:none}
+.tabpanes .two{gap:28px}
 .warn{display:flex;gap:8px;align-items:flex-start;background:var(--warn-bg);color:var(--warn-ink);border-radius:6px;padding:7px 10px;font-size:12.5px}
 .warn::before{content:"!";flex:none;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--warn-dot);color:#1b1300;font:600 11px var(--sans);margin-top:1px}
 
 .xs-wrap{overflow-x:auto}
+.geo-row{display:flex;gap:16px;align-items:flex-start}
+.geo-row>.panel:first-child{flex:1 1 0;min-width:0}
+.geo-row>#lo-panel{flex:0 0 auto;max-width:100%}
+@media (max-width:1180px){.geo-row{flex-direction:column}.geo-row>#lo-panel{width:auto!important}}
+.geo-row .panel{display:flex;flex-direction:column}
+.lo-wrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+#lo{display:block;width:100%;height:auto;max-height:400px;margin:0 auto}
+.lo-foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:11.5px;color:var(--ink2)}
+.lo-foot b{font:500 12px var(--mono);color:var(--ink)}
 #xs{display:block;width:100%;height:auto;max-height:400px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:11.5px;color:var(--ink2)}
 .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px;border:1px solid var(--m-edge)}
@@ -187,7 +226,7 @@ details.model code{font:12px var(--mono);color:var(--ink)}
       <p id="subtitle">Compact-model estimate of gate/junction/plug capacitance, S/D series resistance, I–V and switching delay for one planar NMOS.</p>
     </div>
     <div class="hdr-ctl">
-      <div class="seg" id="devsel" role="group" aria-label="Device type"><button type="button" data-dev="lv">LV logic</button><button type="button" data-dev="hv">HV · 30 V class</button></div>
+      <div class="seg" id="devsel" role="group" aria-label="Device type"><button type="button" data-dev="lv">LV NMOS</button><button type="button" data-dev="hv">HV NMOS · 30 V</button></div>
       <button class="btn" id="reset" type="button">Reset to example device</button>
     </div>
   </header>
@@ -196,9 +235,13 @@ details.model code{font:12px var(--mono);color:var(--ink)}
     <aside class="inputs" id="inputs" aria-label="Device parameters"></aside>
 
     <main>
-      <div id="warns" class="warns"></div>
+      <div class="glance-bar">
+        <details class="wbox" id="wbox" hidden><summary><span class="chev">▸</span><span class="n" id="wcount"></span><span class="first" id="wfirst"></span></summary><div id="warns" class="warns"></div></details>
+        <div class="wok" id="wok">No design notes for this device.</div>
+        <button class="btn" id="kpi-all" type="button" aria-pressed="false">Show all metrics</button>
+      </div>
 
-      <section class="kpis">
+      <section class="kpis" id="kpis">
         <div class="panel">
           <h3><span>DC characteristics</span> <span class="note">per µm of W</span></h3>
           <div class="hero"><b id="h-ion">–</b><span>µA/µm I<sub>on</sub> at V<sub>GS</sub>=V<sub>DS</sub>=V<sub>DD</sub></span></div>
@@ -216,6 +259,51 @@ details.model code{font:12px var(--mono);color:var(--ink)}
         </div>
       </section>
 
+
+      <div class="geo-row">
+      <section class="panel">
+        <h3><span>Cross-section A–A′</span> <span class="note" id="xs-note">drawn to scale except gate dielectric</span></h3>
+        <div class="xs-wrap"><svg id="xs" role="img" aria-label="Device cross-section"></svg></div>
+        <div class="legend" id="xs-legend"></div>
+      </section>
+      <section class="panel" id="lo-panel">
+        <h3><span>Layout (top view)</span> <span class="note" id="lo-note">to scale · one device pitch</span></h3>
+        <div class="lo-wrap"><svg id="lo" role="img" aria-label="Device layout, top view"></svg></div>
+        <div class="legend" id="lo-legend"></div>
+        <div class="lo-foot" id="lo-foot"></div>
+      </section>
+      </div>
+
+      <section class="tabs" id="tabs">
+        <div class="tablist" role="tablist" aria-label="Analyses"><button type="button" role="tab" id="tab-iv" aria-controls="pane-iv" aria-selected="false" tabindex="-1" data-tab="iv">I–V curves</button><button type="button" role="tab" id="tab-rc" aria-controls="pane-rc" aria-selected="false" tabindex="-1" data-tab="rc">C &amp; R breakdown</button><button type="button" role="tab" id="tab-bv" aria-controls="pane-bv" aria-selected="false" tabindex="-1" data-tab="bv">Breakdown</button><button type="button" role="tab" id="tab-sweep" aria-controls="pane-sweep" aria-selected="false" tabindex="-1" data-tab="sweep">Parameter sweep</button><button type="button" role="tab" id="tab-opt" aria-controls="pane-opt" aria-selected="false" tabindex="-1" data-tab="opt">Design optimizer</button><button type="button" role="tab" id="tab-notes" aria-controls="pane-notes" aria-selected="false" tabindex="-1" data-tab="notes">Model notes</button></div>
+        <div class="tabpanes">
+        <div role="tabpanel" id="pane-iv" aria-labelledby="tab-iv" hidden>
+      <section class="two">
+        <div class="panel">
+          <h3><span>I<sub>D</sub>–V<sub>GS</sub></span> <span class="note">log scale, µA/µm</span></h3>
+          <div class="chart" id="c-idvg"></div>
+        </div>
+        <div class="panel">
+          <h3><span>I<sub>D</sub>–V<sub>DS</sub></span> <span class="note">µA/µm, series R included</span></h3>
+          <div class="chart" id="c-idvd"></div>
+        </div>
+      </section>
+        </div>
+        <div role="tabpanel" id="pane-rc" aria-labelledby="tab-rc" hidden>
+      <section class="two">
+        <div class="panel">
+          <h3><span>Capacitance breakdown</span> <span class="note">fF · inversion (on) state</span></h3>
+          <div class="bars" id="cbars"></div>
+          <div class="sum"><span>C<sub>gg</sub> on / off</span><b id="csum">–</b></div>
+        </div>
+        <div class="panel">
+          <h3><span>Series resistance per side</span> <span class="note">Ω · source = drain</span></h3>
+          <div class="bars" id="rbars"></div>
+          <div class="sum"><span>R<sub>S</sub> = R<sub>D</sub> · I<sub>on</sub> loss vs. R<sub>S</sub>=0</span><b id="rsum">–</b></div>
+        </div>
+      </section>
+        </div>
+        <div role="tabpanel" id="pane-bv" aria-labelledby="tab-bv" hidden>
       <section class="panel" id="hf">
         <h3><span>Breakdown &amp; hot carriers</span> <span class="note" id="hf-note">drain–source, gate and body at source</span></h3>
         <div class="two">
@@ -229,37 +317,8 @@ details.model code{font:12px var(--mono);color:var(--ink)}
           </div>
         </div>
       </section>
-
-      <section class="panel">
-        <h3><span>Cross-section along L</span> <span class="note" id="xs-note">drawn to scale except gate dielectric</span></h3>
-        <div class="xs-wrap"><svg id="xs" role="img" aria-label="Device cross-section"></svg></div>
-        <div class="legend" id="xs-legend"></div>
-      </section>
-
-      <section class="two">
-        <div class="panel">
-          <h3><span>Capacitance breakdown</span> <span class="note">fF · inversion (on) state</span></h3>
-          <div class="bars" id="cbars"></div>
-          <div class="sum"><span>C<sub>gg</sub> on / off</span><b id="csum">–</b></div>
         </div>
-        <div class="panel">
-          <h3><span>Series resistance per side</span> <span class="note">Ω · source = drain</span></h3>
-          <div class="bars" id="rbars"></div>
-          <div class="sum"><span>R<sub>S</sub> = R<sub>D</sub> · I<sub>on</sub> loss vs. R<sub>S</sub>=0</span><b id="rsum">–</b></div>
-        </div>
-      </section>
-
-      <section class="two">
-        <div class="panel">
-          <h3><span>I<sub>D</sub>–V<sub>GS</sub></span> <span class="note">log scale, µA/µm</span></h3>
-          <div class="chart" id="c-idvg"></div>
-        </div>
-        <div class="panel">
-          <h3><span>I<sub>D</sub>–V<sub>DS</sub></span> <span class="note">µA/µm, series R included</span></h3>
-          <div class="chart" id="c-idvd"></div>
-        </div>
-      </section>
-
+        <div role="tabpanel" id="pane-sweep" aria-labelledby="tab-sweep" hidden>
       <section class="panel">
         <h3><span>Parameter sweep</span> <span class="note">all other inputs held at current values · dashed line = current value</span></h3>
         <div class="ctl">
@@ -268,7 +327,8 @@ details.model code{font:12px var(--mono);color:var(--ink)}
         </div>
         <div class="chart" id="c-sweep"></div>
       </section>
-
+        </div>
+        <div role="tabpanel" id="pane-opt" aria-labelledby="tab-opt" hidden>
       <section class="panel" id="opt">
         <h3><span>Design optimizer</span> <span class="note">NSGA-II genetic algorithm · switch on only the knobs you want it to move</span></h3>
         <div class="opt-grid">
@@ -305,8 +365,10 @@ details.model code{font:12px var(--mono);color:var(--ink)}
         </div>
       </section>
 
+        </div>
+        <div role="tabpanel" id="pane-notes" aria-labelledby="tab-notes" hidden>
       <section class="panel">
-        <details class="model">
+        <details class="model" open>
           <summary>Model equations and assumptions</summary>
           <div class="cols">
             <div>
@@ -352,6 +414,9 @@ details.model code{font:12px var(--mono);color:var(--ink)}
           </div>
         </details>
       </section>
+        </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -385,11 +450,17 @@ function fmtIn(v,d){
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* ================= input panel ================= */
+// collapsible groups (state per browser; contacts and layout start collapsed)
+const GRP_DEF_SHUT={plug:1,layout:1};
+function grpShut(id){ try{ const v=localStorage.getItem("nmos-grp-"+id); if(v!==null) return v==="1"; }catch(e){} return !!GRP_DEF_SHUT[id]; }
+function toggleGrp(sec){ const shut=!sec.classList.contains("shut"); sec.classList.toggle("shut",shut); sec.querySelector(".grp-h").setAttribute("aria-expanded",String(!shut)); try{localStorage.setItem("nmos-grp-"+sec.dataset.grp,shut?"1":"0");}catch(e){} }
+document.addEventListener("click",e=>{ const h=e.target.closest(".grp-h"); if(!h||e.target.closest(".tk-help")) return; toggleGrp(h.parentElement); });
+document.addEventListener("keydown",e=>{ const h=e.target.closest&&e.target.closest(".grp-h"); if(h&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); toggleGrp(h.parentElement); } });
 const inputsEl=document.getElementById("inputs");
 function buildInputs(){
   let html="";
   GROUPS.forEach(g=>{
-    html+=`<section class="grp"><div class="grp-h"><h2>${g.name}</h2><span class="derived" id="der-${g.id}"></span></div>`;
+    html+=`<section class="grp${grpShut(g.id)?" shut":""}" data-grp="${g.id}"><div class="grp-h" role="button" tabindex="0" aria-expanded="${!grpShut(g.id)}"><h2>${g.name}</h2><span class="derived" id="der-${g.id}"></span></div>`;
     if(g.id==="stack"){
       html+=`<div class="seg" role="group" aria-label="Gate electrode"><button type="button" data-gate="poly">n⁺ poly-Si gate</button><button type="button" data-gate="metal">Metal gate</button></div>`;
     }
@@ -441,44 +512,47 @@ function syncAll(){
 
 /* ================= outputs ================= */
 const $=id=>document.getElementById(id);
-function kv(el,rows){el.innerHTML=rows.map(r=>`<div class="k">${r[0]}${r[3]?`<small>${r[3]}</small>`:""}</div><div class="v">${r[1]}<small>${r[2]||""}</small></div>`).join("");}
+// rows: [label, value, unit, note, key]. Rows without key are hidden until "Show all metrics" is on.
+function kv(el,rows){ const lastKey=rows.map(r=>!!r[4]).lastIndexOf(true);
+  el.innerHTML=rows.map((r,i)=>{const c=(r[4]?"":"more")+(i===lastKey?" key-last":""); return `<div class="k ${c}">${r[0]}${r[3]?`<small>${r[3]}</small>`:""}</div><div class="v ${c}">${r[1]}<small>${r[2]||""}</small></div>`;}).join("");}
 
 function renderKPIs(M){
   const Wum=M.W/1000;
   $("h-ion").textContent=fmt(M.Ion*1e6/Wum,3);
   kv($("kv-dc"),[
-    ["V<sub>th</sub> lin / sat",`${fmt(M.VthLin,3)} / ${fmt(M.VthSat,3)}`,"V",`V<sub>DS</sub> = 0.05 V / ${fmt(M.p.VDD,3)} V · long-channel ${fmt(M.VthL,3)} V`],
-    ["I<sub>off</sub> total",fmt(M.IoffTot*1e9/Wum,3),"nA/µm",`subthreshold ${fmt(M.Ioff*1e9/Wum,2)} · gate–drain tunnelling ${fmt(M.Iedt*1e9/Wum,2)} · GIDL ${fmt(M.Igidl*1e9/Wum,2)} · junction BTBT ${fmt(M.Ibtbt*1e9/Wum,2)} · SRH generation ${fmt(M.Igen*1e9/Wum,2)}`],
+    ["V<sub>th</sub> lin / sat",`${fmt(M.VthLin,3)} / ${fmt(M.VthSat,3)}`,"V",`V<sub>DS</sub> = 0.05 V / ${fmt(M.p.VDD,3)} V · long-channel ${fmt(M.VthL,3)} V`,1],
+    ["I<sub>off</sub> total",fmt(M.IoffTot*1e9/Wum,3),"nA/µm",`subthreshold ${fmt(M.Ioff*1e9/Wum,2)} · gate–drain tunnelling ${fmt(M.Iedt*1e9/Wum,2)} · GIDL ${fmt(M.Igidl*1e9/Wum,2)} · junction BTBT ${fmt(M.Ibtbt*1e9/Wum,2)} · SRH generation ${fmt(M.Igen*1e9/Wum,2)}`,1],
     ["I<sub>on</sub>/I<sub>off</sub>",fmt(M.Ion/M.IoffTot,3),""],
     ["I<sub>g</sub> on (gate tunnelling)",fmt(M.Igc*1e9/Wum,3),"nA/µm",`V<sub>ox</sub> ${fmt(M.VoxOn,3)} V at V<sub>GS</sub> = V<sub>DD</sub>`],
-    ["Subthreshold swing",fmt(M.SS,3),"mV/dec"],
-    ["DIBL",fmt(M.DIBL,3),"mV/V"],
+    ["Subthreshold swing",fmt(M.SS,3),"mV/dec","",!M.hv],
+    ["DIBL",fmt(M.DIBL,3),"mV/V","",!M.hv],
+    ["BV<sub>dss</sub>",fmt(M.BVdss,3),"V",M.breakdown().mech,1],
     ["R<sub>on</sub>·W",fmt(M.Ron*Wum,3),"Ω·µm","V<sub>DS</sub> = 0.05 V"],
     ...(M.hv?[
-      ["Specific R<sub>on</sub>·A",fmt(M.RonA,3),"mΩ·mm²",`R<sub>on</sub> × footprint ${fmt(M.areaUm2,3)} µm²`],
-      ["Pass voltage at V<sub>G</sub> = V<sub>DD</sub>",fmt(M.Vpass,3),"V",`body effect: V<sub>G</sub> − V<sub>out</sub> = V<sub>th</sub>(V<sub>SB</sub> + V<sub>out</sub>) · gate needed to pass V<sub>DD</sub>: ${fmt(M.VgReq,3)} V`],
+      ["Specific R<sub>on</sub>·A",fmt(M.RonA,3),"mΩ·mm²",`R<sub>on</sub> × footprint ${fmt(M.areaUm2,3)} µm²`,1],
+      ["Pass voltage at V<sub>G</sub> = V<sub>DD</sub>",fmt(M.Vpass,3),"V",`body effect: V<sub>G</sub> − V<sub>out</sub> = V<sub>th</sub>(V<sub>SB</sub> + V<sub>out</sub>) · gate needed to pass V<sub>DD</sub>: ${fmt(M.VgReq,3)} V`,1],
       ["Field-transistor V<sub>th</sub>",fmt(M.VthFld,3),"V",`poly over ${fmt(M.p.tfox,3)} nm field oxide, channel stop ${fmtIn(M.p.Nfld,{log:1})} cm⁻³`]
     ]:[])
   ]);
   $("h-cgg").textContent=fmt(M.CggOn*1e15,3);
   kv($("kv-par"),[
     ["C<sub>gg</sub> off",fmt(M.CggOff*1e15,3),"fF","depletion + fringes"],
-    ["C<sub>gd</sub> (extrinsic)",fmt(M.Cgd*1e15,3),"fF","overlap + outer fringe + plug"],
-    ["C<sub>j</sub> drain",fmt(M.CjAvg*1e15,3),"fF",`average 0→V<sub>DD</sub> · zero-bias ${fmt(M.Cj0*1e15,3)} fF`],
-    ["R<sub>S</sub> per side",fmt(M.Rs,3),"Ω",`R<sub>S</sub>·W = ${fmt(M.Rs*Wum,3)} Ω·µm`],
+    ["C<sub>gd</sub> (extrinsic)",fmt(M.Cgd*1e15,3),"fF","overlap + outer fringe + plug",1],
+    ["C<sub>j</sub> drain",fmt(M.CjAvg*1e15,3),"fF",`average 0→V<sub>DD</sub> · zero-bias ${fmt(M.Cj0*1e15,3)} fF`,1],
+    ["R<sub>S</sub> per side",fmt(M.Rs,3),"Ω",`R<sub>S</sub>·W = ${fmt(M.Rs*Wum,3)} Ω·µm`,1],
     ["R<sub>g</sub> gate",fmt(M.Rg,3),"Ω",`R<sub>sh</sub> ${fmt(M.RshG,3)} Ω/□`],
     ["ρ<sub>c</sub> contact",fmt(M.rhoc,3),"Ω·cm²"],
-    ["Footprint area",fmt(M.areaUm2,3),"µm²",`(L<sub>g</sub> + 2·L<sub>sd</sub> + S<sub>L</sub>) × (W + S<sub>W</sub>)${M.p.lsdAuto?" · L<sub>sd</sub> from contact rule":""}`],
+    ["Footprint area",fmt(M.areaUm2,3),"µm²",`(L<sub>g</sub> + 2·L<sub>sd</sub> + S<sub>L</sub>) × (W + S<sub>W</sub>)${M.p.lsdAuto?" · L<sub>sd</sub> from contact rule":""}`,1],
     ["I<sub>on</sub> per area",fmt(M.Ion*1e6/M.areaUm2,3),"µA/µm²",`whole device I<sub>on</sub> ${fmt(M.Ion*1e6,3)} µA`]
   ]);
   $("h-tau").textContent=fmt(M.tau*1e12,3);
   kv($("kv-spd"),[
-    ["t<sub>pHL</sub> drain discharge",fmt(M.tpHL*1e12,3),"ps",`C<sub>drain</sub> ${fmt(M.Cdrain*1e15,3)} fF, I<sub>eff</sub> ${fmt(M.Ieff*1e6/Wum,3)} µA/µm`],
+    ["t<sub>pHL</sub> drain discharge",fmt(M.tpHL*1e12,3),"ps",`C<sub>drain</sub> ${fmt(M.Cdrain*1e15,3)} fF, I<sub>eff</sub> ${fmt(M.Ieff*1e6/Wum,3)} µA/µm`,1],
     ["Gate RC  R<sub>g</sub>·C<sub>gg</sub>",fmt(M.tauG*1e12,3),"ps"],
     ["g<sub>m</sub>",fmt(M.gm*1e6/Wum,3),"µS/µm"],
-    ["f<sub>T</sub>",fmt(M.fT/1e9,3),"GHz"],
-    ["f<sub>max</sub>",fmt(M.fmax/1e9,3),"GHz"],
-    ["Gate-oxide field",fmt(M.Eox/1e6,3),"MV/cm","SiO₂-equivalent at V<sub>DD</sub>"]
+    ["f<sub>T</sub>",fmt(M.fT/1e9,3),"GHz","",1],
+    ["f<sub>max</sub>",fmt(M.fmax/1e9,3),"GHz","",1],
+    ["Gate-oxide field",fmt(M.Eox/1e6,3),"MV/cm","SiO₂-equivalent at V<sub>DD</sub>",1]
   ]);
   $("der-stack").textContent=`EOT ${fmt(M.EOT/nm,3)} · Tinv ${fmt(M.Toxe/nm,3)} nm`;
   $("der-geo").textContent=`Leff ${fmt(M.LeffNm,3)} nm`+(M.hv?` · drift ${fmt(M.Loff,3)} nm`:"");
@@ -516,6 +590,8 @@ function renderWarns(M){
   { const leak=[["gate–drain tunnelling",M.Iedt],["GIDL",M.Igidl],["junction band-to-band tunnelling",M.Ibtbt]].sort((a,b)=>b[1]-a[1])[0];
     if(leak[1]>M.Ioff) w.push(`Off-state leakage is dominated by ${leak[0]} (${fmt(leak[1]/M.IoffTot*100,2)}% of total I<sub>off</sub>), not by subthreshold conduction.`); }
   $("warns").innerHTML=w.map(s=>`<div class="warn"><div>${s}</div></div>`).join("");
+  $("wbox").hidden=!w.length; $("wok").hidden=!!w.length;
+  if(w.length){ $("wcount").textContent=w.length===1?"1 design note":`${w.length} design notes`; const d=document.createElement("div"); d.innerHTML=w[0]; $("wfirst").textContent=d.textContent; }
 }
 
 function bars(el,items,unit,total){
@@ -655,6 +731,68 @@ function renderXS(M){
   $("xs-note").textContent=`drawn to scale in nm · gate dielectric ${(p.tIL+p.tHK)<4*u?"exaggerated for visibility":"to scale"} · plug-to-gate spacing is edge to edge`;
   const legend=[["--m-poly","n⁺ poly gate",P.gate==="poly"],["--m-metal","metal gate",P.gate==="metal"],["--m-ox","SiO₂ / STI",1],["--m-hk","high-k",P.tHK>0],["--m-sp","spacer",1],["--m-ild","ILD",1],["--m-w","plug",1],["--m-np",`deep n⁺ S/D · ${fmtIn(P.Nsd,{log:1})} cm⁻³`,1],["--m-next",`${P.dev==="hv"?"drift LDD":"extension (LDD)"} · ${fmtIn(P.Next,{log:1})} cm⁻³`,1],["--m-ddd",`DDD (deep n⁻) · ${fmtIn(P.Nddd,{log:1})} cm⁻³`,P.dev==="hv"],["--m-si","p-well",1]];
   $("xs-legend").innerHTML=legend.filter(l=>l[2]).map(l=>`<span><i style="background:var(${l[0]})"></i>${l[1]}</span>`).join("");
+}
+
+/* ================= layout (top view) ================= */
+function renderLayout(M){
+  const p=M.p, svg=$("lo"), hv=M.hv, gE=p.Lg/2, half=gE+p.Lsd;
+  const cx=half+p.SL/2, cy0=-p.SW/2, cy1=p.W+p.SW/2;          // one device pitch: (L_g + 2L_sd + S_L) × (W + S_W)
+  const Lpitch=2*cx, Wpitch=cy1-cy0;
+  // size the panel to the drawing's aspect so a tall HV layout does not squeeze the cross-section
+  const pxH=400, mLp=58, mRp=26, mTp=30, mBp=34;               // margins in screen px for labels and dimensions
+  const pxW=Math.min(460,Math.max(250,(Wpitch>0?Lpitch/Wpitch:1)*(pxH-mTp-mBp)+mLp+mRp));
+  $("lo-panel").style.width=(pxW+34)+"px";
+  const u=Math.max(Lpitch/(pxW-mLp-mRp), Wpitch/(pxH-mTp-mBp)); // drawing units (nm) per screen px
+  const vbW=Lpitch+(mLp+mRp)*u, vbH=Wpitch+(mTp+mBp)*u, x0=-cx-mLp*u, y0=cy0-mTp*u;
+  svg.setAttribute("viewBox",`${x0} ${y0} ${vbW} ${vbH}`);
+  svg.style.maxWidth=pxW+"px";
+  const st=`vector-effect="non-scaling-stroke"`, fs=11*u, tk=4*u;
+  const R=(x,y,w,h,fill,extra="")=>`<rect x="${x}" y="${y}" width="${Math.max(w,0)}" height="${Math.max(h,0)}" style="fill:var(${fill});stroke:var(--m-edge);stroke-width:.7" ${st} ${extra}/>`;
+  const T=(x,y,t,a="middle",c="--ink",halo=true)=>`<text x="${x}" y="${y}" text-anchor="${a}" style="fill:var(${c});font:${fs}px var(--sans);${halo?`paint-order:stroke;stroke:var(--panel);stroke-width:${3*u}px;stroke-linejoin:round`:""}">${t}</text>`;
+  const dimH=(x1,x2,y,label,below=false)=>`<g style="stroke:var(--ink2);stroke-width:1"><line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" ${st}/><line x1="${x1}" y1="${y-tk}" x2="${x1}" y2="${y+tk}" ${st}/><line x1="${x2}" y1="${y-tk}" x2="${x2}" y2="${y+tk}" ${st}/></g>`+T((x1+x2)/2,below?y+fs+1*u:y-3*u,label);
+  const dimV=(x,y1,y2,label)=>`<g style="stroke:var(--ink2);stroke-width:1"><line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" ${st}/><line x1="${x-tk}" y1="${y1}" x2="${x+tk}" y2="${y1}" ${st}/><line x1="${x-tk}" y1="${y2}" x2="${x+tk}" y2="${y2}" ${st}/></g>`
+    +`<text x="${x-4*u}" y="${(y1+y2)/2}" text-anchor="middle" transform="rotate(-90 ${x-4*u} ${(y1+y2)/2})" style="fill:var(--ink);font:${fs}px var(--sans)">${label}</text>`;
+  let s="";
+  // field (isolation) inside the pitch; cell boundary dashed
+  s+=`<rect x="${-cx}" y="${cy0}" width="${Lpitch}" height="${Wpitch}" style="fill:var(--m-ox);opacity:.55"/>`;
+  s+=`<rect x="${-cx}" y="${cy0}" width="${Lpitch}" height="${Wpitch}" style="fill:none;stroke:var(--ink2);stroke-width:1;stroke-dasharray:5 4" ${st}/>`;
+  // active: n⁺ S/D, with the lightly doped part next to the gate (LV: extension under the spacer; HV: drift + DDD overhang)
+  s+=R(-half,0,2*half,p.W,"--m-np");
+  [-1,1].forEach(sg=>{
+    const X=(a,b)=>sg>0?[a,b-a]:[-b,b-a];
+    if(hv){ const Lo=M.Loff, Oe=M.Oeff;
+      let [xa,w]=X(gE,gE+Lo); s+=R(xa,0,w,p.W,"--m-next");
+      if(Oe>0){ [xa,w]=X(gE+Lo-Oe,gE+Lo); s+=`<rect x="${xa}" y="0" width="${w}" height="${p.W}" style="fill:var(--m-ddd);stroke:var(--m-edge);stroke-width:.7;stroke-dasharray:3 2" ${st}/>`; } }
+    else { const [xa,w]=X(gE,gE+Math.min(p.Wsp,p.Lsd)); s+=R(xa,0,w,p.W,"--m-next"); }
+  });
+  // spacers along both poly edges; poly line runs across the active and ends at the cell edge (endcap)
+  s+=`<rect x="${-gE-p.Wsp}" y="${cy0}" width="${p.Wsp}" height="${Wpitch}" style="fill:var(--m-sp);opacity:.75"/>`;
+  s+=`<rect x="${gE}" y="${cy0}" width="${p.Wsp}" height="${Wpitch}" style="fill:var(--m-sp);opacity:.75"/>`;
+  s+=R(-gE,cy0,p.Lg,Wpitch,p.gate==="poly"?"--m-poly":"--m-metal");
+  // contacts, evenly along W on each side
+  const cxs=[-(gE+p.dpg+p.CD),gE+p.dpg];
+  const ys=[...Array(p.Np)].map((_,i)=>(i+0.5)*p.W/p.Np-p.CD/2);
+  cxs.forEach(x=>ys.forEach(y=>{ s+=R(x,y,p.CD,p.CD,"--m-w"); }));
+  // cut line A–A′ through the first row of contacts: the cross-section on the left is taken here
+  const ya=ys[0]+p.CD/2;
+  s+=`<line x1="${-cx-14*u}" y1="${ya}" x2="${cx+12*u}" y2="${ya}" style="stroke:var(--accent);stroke-width:1.3;stroke-dasharray:7 4" ${st}/>`;
+  s+=`<text x="${-cx-16*u}" y="${ya+fs/3}" text-anchor="end" style="fill:var(--accent);font:600 ${fs}px var(--sans)">A</text><text x="${cx+14*u}" y="${ya+fs/3}" style="fill:var(--accent);font:600 ${fs}px var(--sans)">A′</text>`;
+  // S / D tags in the outer n⁺ region
+  const xo=(gE+(hv?M.Loff:p.Wsp)+half)/2;
+  s+=T(-xo,p.W-6*u,"S","middle","--ink");
+  s+=T(xo,p.W-6*u,"D","middle","--ink");
+  // dimensions: L_g above, W at left, L_sd below; plug gap (and HV drift) inside the drain side
+  s+=dimH(-gE,gE,cy0-8*u,`Lg ${fmtIn(p.Lg,{})}`);
+  s+=dimV(-cx-30*u,0,p.W,`W ${fmtIn(p.W,{})}`);
+  s+=dimH(gE,half,cy1+8*u,`L_sd ${fmtIn(p.Lsd,{})}`,true);
+  const yg=ys[0]+p.CD+16*u;
+  if(yg<p.W-2*fs) s+=dimH(gE,gE+p.dpg,yg,`${fmtIn(p.dpg,{})}`);
+  if(hv&&p.W>6*fs) s+=dimH(gE,gE+M.Loff,p.W-18*u,`drift ${fmtIn(M.Loff,{})}`);
+  svg.innerHTML=s;
+  $("lo-note").textContent="to scale in nm";
+  const leg=[["--m-np","active · n⁺ S/D"],["--m-next",hv?"drift LDD":"extension"],["--m-ddd","DDD overhang",hv],["--m-poly","poly gate",p.gate==="poly"],["--m-metal","metal gate",p.gate!=="poly"],["--m-sp","spacer"],["--m-w","contact"],["--m-ox","field (STI)"]];
+  $("lo-legend").innerHTML=leg.filter(l=>l[2]!==false).map(l=>`<span><i style="background:var(${l[0]})"></i>${l[1]}</span>`).join("")+`<span><i style="background:none;border:1px dashed var(--ink2)"></i>device pitch</span>`;
+  $("lo-foot").innerHTML=`<span>pitch <b>${fmt(Lpitch/1000,3)} × ${fmt(Wpitch/1000,3)} µm</b> · area <b>${fmt(Lpitch*Wpitch*1e-6,3)} µm²</b></span><span>${p.Np} contact${p.Np>1?"s":""} per side</span>`;
 }
 
 /* ================= charts ================= */
@@ -1016,7 +1154,7 @@ let pending=false, lastM=null;
 function renderAll(){
   pending=false;
   const M=model(P); lastM=M;
-  renderKPIs(M); renderWarns(M); renderBreakdown(M); renderHF(M); renderXS(M); renderIV(M); renderSweep();
+  renderKPIs(M); renderWarns(M); renderBreakdown(M); renderHF(M); renderXS(M); renderLayout(M); renderIV(M); renderSweep();
 }
 function schedule(){if(!pending){pending=true;requestAnimationFrame(renderAll);}}
 function setDev(dev){
@@ -1032,6 +1170,17 @@ document.querySelectorAll("#devsel [data-dev]").forEach(b=>b.addEventListener("c
 $("reset").addEventListener("click",()=>{P={...PRESETS[P.dev]};PARAMS.forEach(d=>{const t=$("in-"+d.k);t.classList.remove("bad");});syncAll();schedule();});
 let dev0="lv"; try{ if(localStorage.getItem("nmos-bench-dev")==="hv") dev0="hv"; }catch(e){}
 setDev(dev0); renderAll();
+// analysis tabs: one visible at a time; charts redraw when their tab is shown
+function showTab(k,focus){ document.querySelectorAll('#tabs [role=tab]').forEach(b=>{const on=b.dataset.tab===k; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; if(on&&focus) b.focus();});
+  document.querySelectorAll('#tabs [role=tabpanel]').forEach(p=>p.hidden=p.id!=="pane-"+k);
+  try{localStorage.setItem("nmos-tab",k);}catch(e){}
+  if(lastM){ if(k==="iv") renderIV(lastM); if(k==="sweep") renderSweep(); if(k==="opt") drawOpt(); } }
+document.querySelector("#tabs .tablist").addEventListener("click",e=>{const b=e.target.closest("[role=tab]"); if(b) showTab(b.dataset.tab);});
+document.querySelector("#tabs .tablist").addEventListener("keydown",e=>{ const bs=[...document.querySelectorAll('#tabs [role=tab]')], i=bs.indexOf(document.activeElement); if(i<0) return;
+  if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ e.preventDefault(); const j=(i+(e.key==="ArrowRight"?1:-1)+bs.length)%bs.length; showTab(bs[j].dataset.tab,true);} });
+{ let t0="iv"; try{ const v=localStorage.getItem("nmos-tab"); if(v&&document.getElementById("pane-"+v)) t0=v; }catch(e){} showTab(t0); }
+$("kpi-all").addEventListener("click",()=>{ const on=!$("kpis").classList.contains("all"); $("kpis").classList.toggle("all",on); $("kpi-all").setAttribute("aria-pressed",String(on)); $("kpi-all").textContent=on?"Show key metrics":"Show all metrics"; try{localStorage.setItem("nmos-kpi-all",on?"1":"0");}catch(e){} });
+try{ if(localStorage.getItem("nmos-kpi-all")==="1") $("kpi-all").click(); }catch(e){}
 let rt; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(lastM){renderIV(lastM);renderSweep();drawOpt();}},120);});
 })();
 </script>

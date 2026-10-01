@@ -8,7 +8,7 @@ help:[
   [".grp-h h2",/Gate stack/i,"g-stack"],[".grp-h h2",/Geometry/i,"g-geo"],[".grp-h h2",/Doping/i,"g-dop"],
   [".grp-h h2",/Contact plug/i,"g-plug"],[".grp-h h2",/Layout/i,"g-layout"],[".grp-h h2",/Operating/i,"g-op"],
   [".panel h3",/^DC characteristics/i,"dc"],[".panel h3",/^Parasitics/i,"para"],[".panel h3",/^Speed/i,"speed"],
-  [".panel h3",/^Breakdown/i,"bv"],[".panel h3",/^Cross-section/i,"xs"],[".panel h3",/^Capacitance breakdown/i,"cap"],
+  [".panel h3",/^Breakdown/i,"bv"],[".panel h3",/^Cross-section/i,"xs"],[".panel h3",/^Layout \(top/i,"layout"],[".panel h3",/^Capacitance breakdown/i,"cap"],
   [".panel h3",/^Series resistance/i,"res"],[".panel h3",/–VGS|–V\s*GS/i,"iv"],[".panel h3",/–VDS|–V\s*DS/i,"iv"],
   [".panel h3",/^Parameter sweep/i,"sweep"],[".panel h3",/^Design optimizer/i,"opt"]
 ],
@@ -17,8 +17,11 @@ guide:`
   <h3>Getting started</h3>
   <p>This page is a compact model of a single planar NMOS: closed-form device equations, the kind circuit simulators use, rather than a field solver. One evaluation takes well under a millisecond, so every result follows your inputs as you type or drag.</p>
   <ul>
-    <li>Inputs are on the left, grouped by what they describe. The cross-section in the middle is drawn to scale from them.</li>
-    <li>The switch at the top changes between a 90 nm-class logic device (<b>LV logic</b>) and a 30 V-class high-voltage device (<b>HV</b>).</li>
+    <li>Inputs are on the left, grouped by what they describe. Click a group title to fold it away; its key derived value stays visible.</li>
+    <li>Key results sit at the top. <b>Show all metrics</b> expands each panel to the full list.</li>
+    <li>The cross-section and the top-view layout below them are drawn to scale from the inputs.</li>
+    <li>Detailed analyses are in the tabs further down: I–V curves, C and R breakdown, breakdown, parameter sweep, the optimizer and the model notes.</li>
+    <li>The switch at the top changes between a low-voltage, 90 nm-class device (<b>LV NMOS</b>) and a 30 V-class high-voltage device (<b>HV NMOS</b>).</li>
     <li><b>Reset to example device</b> returns to the defaults.</li>
   </ul>
   <div class="try">Try this first: drag <b>Gate length</b> down from 90 nm. V<sub>th</sub> falls and I<sub>off</sub> climbs (short-channel effects) while CV/I gets faster. Then raise <b>Gate height</b>: C<sub>gg</sub> grows through the sidewall fringe, but the gate resistance falls.</div>
@@ -81,9 +84,14 @@ guide:`
   <p>Hot carriers: substrate current from Hu's model; on-state snapback when that current through the substrate resistance forward-biases the source by 0.7 V. The local-field model overestimates I<sub>sub</sub> below about 1.5 V. V<sub>th</sub> mismatch follows Pelgrom, σ = A<sub>VT</sub>/√(W·L<sub>eff</sub>).</p>
 </section>
 
-<section id="xs" data-short="Cross-section">
-  <h3>Cross-section</h3>
+<section id="xs" data-short="Device views">
+  <h3>Cross-section and layout</h3>
+  <h4>Cross-section A–A′</h4>
   <p>Drawn to scale in nm along the channel, except the gate dielectric, which is exaggerated so it stays visible. Colours: poly gate, oxide and isolation, spacer, plugs, the n⁺ source/drain, the extension, and (HV) the drift and DDD layers. Use it to check that the geometry you typed is the device you meant: a plug inside the spacer or an extension deeper than the S/D shows up immediately.</p>
+  <h4 id="layout">Layout (top view)</h4>
+  <p>The same device seen from above, to scale: the active area (n⁺ source and drain, with the lightly doped part next to the gate), the poly gate with its spacers, the contact plugs spread evenly along the width, and the isolation around it. The dashed box is one device pitch, (L<sub>g</sub> + 2·L<sub>sd</sub> + S<sub>L</sub>)·(W + S<sub>W</sub>), which is the area used everywhere else on the page.</p>
+  <p>The blue line A–A′ marks where the cross-section is cut: through the first row of contacts.</p>
+  <div class="try">Switch the active length to <b>From contact rule</b> under Layout and area, then shrink the plug gap: the active, the drain junction and the pitch all shrink together.</div>
 </section>
 
 <section id="cap" data-short="C and R">
